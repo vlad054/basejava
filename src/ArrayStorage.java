@@ -5,8 +5,7 @@ import java.util.Arrays;
  */
 public class ArrayStorage {
     Resume[] storage = new Resume[10000];
-
-    int size = 0;
+    int size;
 
     void clear() {
         for (int i = 0; i < size; i++) {
@@ -32,21 +31,20 @@ public class ArrayStorage {
     }
 
     void delete(String uuid) {
-        boolean flag = false;
 
         for (int i = 0; i < size; i++) {
             if (storage[i].uuid.equals(uuid)) {
-                flag = true;
-            }
-            if (flag) {
-                if ( (i + 1) != storage.length){
-                    storage[i] = storage[i + 1];
+                if ((i + 1) != storage.length) {
+                    storage[i] = storage[size - 1];
+                    size--;
+                    return;
                 } else {
                     storage[i] = null;
+                    size--;
+                    return;
                 }
             }
         }
-        size--;
     }
 
     /**
