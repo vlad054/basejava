@@ -28,6 +28,33 @@ public class MainTestArrayStorage {
         printAll();
 
         System.out.println("Size: " + ARRAY_STORAGE.size());
+
+        // my Tests
+        for (int i = 0; i < 10000; i++) {
+            Resume r = new Resume();
+            r.uuid = "uuid" + i;
+            ARRAY_STORAGE.save(r);
+        }
+        printAll();
+        System.out.println("Size: " + ARRAY_STORAGE.size());
+
+        ARRAY_STORAGE.delete("uuid9999");
+        ARRAY_STORAGE.delete("uuid0");
+        printAll();
+        System.out.println("Size: " + ARRAY_STORAGE.size());
+
+        Resume r = new Resume();
+        r.uuid = "D";
+
+        ARRAY_STORAGE.save(r);
+        ARRAY_STORAGE.save(r);
+        printAll();
+        System.out.println("Size: " + ARRAY_STORAGE.size());
+
+        ARRAY_STORAGE.clear();
+        printAll();
+        System.out.println("Size: " + ARRAY_STORAGE.size());
+
     }
 
     static void printAll() {
