@@ -31,18 +31,12 @@ public class ArrayStorage {
     }
 
     void delete(String uuid) {
-
         for (int i = 0; i < size; i++) {
             if (storage[i].uuid.equals(uuid)) {
-                if ((i + 1) != storage.length) {
-                    storage[i] = storage[size - 1];
-                    size--;
-                    return;
-                } else {
-                    storage[i] = null;
-                    size--;
-                    return;
-                }
+                storage[i] = storage[size - 1];
+                storage[size - 1] = null;
+                size--;
+                break;
             }
         }
     }
