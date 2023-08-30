@@ -48,6 +48,8 @@ public class MainTestArrayStorage {
 
         Resume r = new Resume();
         r.setUuid("D");
+        Resume r5 = new Resume();
+        r5.setUuid("TT");
 
         ARRAY_STORAGE.update(r);
         ARRAY_STORAGE.save(r);

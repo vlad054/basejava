@@ -18,44 +18,54 @@ public class ArrayStorage {
 
     public void save(Resume r) {
         if (size == storage.length) {
-            System.out.println("Массив storage переполнен, добавление не возможно");
+            System.out.println("Массив storage заполнен, добавление не возможно");
         }
 
-        if (get(r.getUuid()) == null) {
-            if (size < storage.length) {
-                storage[size] = r;
-                size++;
-                System.out.println("Экземпляр с uuid=" + r.getUuid() + " добавлен");
-            }
+        if (getIn(r.getUuid()) == null) {
+            storage[size] = r;
+            size++;
+            System.out.println("Экземпляр с uuid=" + r.getUuid() + " добавлен");
+        } else {
+            System.out.println("Найден экземпляр с uuid=" + r.getUuid() + " добавление отменено");
         }
     }
 
     public Resume get(String uuid) {
+        Resume r = getIn(uuid);
+        if (r != null) {
+            return r;
+        } else {
+            System.out.println("Не найден экземпляр с uuid=" + uuid);
+            return null;
+        }
+    }
+
+    public void delete(String uuid) {
+        Resume r = getIn(uuid);
+        if (r != null) {
+            r.setUuid(storage[size - 1].getUuid());
+            storage[size - 1] = null;
+            size--;
+        } else {
+            System.out.println("Не найден экземпляр с uuid=" + uuid);
+        }
+    }
+
+    private Resume getIn(String uuid) {
         for (int i = 0; i < size; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return storage[i];
             }
         }
-        System.out.println("Не найден экземпляр с uuid=" + uuid);
         return null;
     }
 
-    public void delete(String uuid) {
-        if (get(uuid) != null) {
-            for (int i = 0; i < size; i++) {
-                if (storage[i].getUuid().equals(uuid)) {
-                    storage[i] = storage[size - 1];
-                    storage[size - 1] = null;
-                    size--;
-                    break;
-                }
-            }
-        }
-    }
-
     public void update(Resume r) {
-        if (get(r.getUuid()) != null) {
-
+        Resume resume = getIn(r.getUuid());
+        if (resume != null) {
+            resume = r;
+        } else {
+            System.out.println("Не найден экземпляр с uuid=" + r.getUuid());
         }
     }
 
