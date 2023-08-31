@@ -9,8 +9,8 @@ import java.util.Arrays;
  */
 public class ArrayStorage {
 
-    private final static int NUM_RES = 10000;
-    Resume[] storage = new Resume[NUM_RES];
+    private final static int STORAGE_LIMIT = 10000;
+    Resume[] storage = new Resume[STORAGE_LIMIT];
     int size;
 
     public void clear() {
