@@ -51,8 +51,8 @@ public class MainTestArrayStorage {
         Resume r5 = new Resume();
         r5.setUuid("TT");
 
+        ARRAY_STORAGE.update(r5);
         ARRAY_STORAGE.update(r);
-        ARRAY_STORAGE.save(r);
         printAll();
         System.out.println("Size: " + ARRAY_STORAGE.size());
 
