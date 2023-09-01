@@ -7,14 +7,12 @@ import java.util.Arrays;
 public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
-    public void saveIn(Resume r) {
+    protected void saveResume(Resume r) {
         int ind = Arrays.binarySearch(storage, 0, size, r);
         if (ind > 0) {
             System.out.println("Resume " + r.getUuid() + " already exist");
         } else {
-            for (int i = size; i >= -ind; i--) {
-                storage[i] = storage[i - 1];
-            }
+            System.arraycopy(storage, -ind - 1, storage, -ind, size + ind + 1);
             storage[-ind - 1] = r;
             size++;
         }
@@ -28,10 +26,8 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void deleteIn(int ind) {
-        for (int i = ind; i < size; i++) {
-            storage[i] = storage[i + 1];
-        }
+    protected void deleteResume(int ind) {
+        System.arraycopy(storage, ind + 1, storage, ind, size - ind + 1);
     }
 
 }

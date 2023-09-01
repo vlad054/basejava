@@ -8,7 +8,7 @@ import ru.javawebinar.basejava.model.Resume;
 public class ArrayStorage extends AbstractArrayStorage {
 
     @Override
-    public void saveIn(Resume r) {
+    protected void saveResume(Resume r) {
         if (getIndex(r.getUuid()) != -1) {
             System.out.println("Resume " + r.getUuid() + " already exist");
         } else {
@@ -18,7 +18,7 @@ public class ArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void deleteIn(int ind) {
+    protected void deleteResume(int ind) {
         storage[ind] = storage[size - 1];
         storage[size - 1] = null;
     }
