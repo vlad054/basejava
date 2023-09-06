@@ -58,6 +58,9 @@ public abstract class AbstractArrayStorageTest {
 
     @Test
     public void save() throws Exception {
+        storage.save(new Resume("uuid4"));
+        Assert.assertEquals(4, storage.size());
+        Assert.assertThrows(ExistStorageException.class, () -> storage.save(new Resume("uuid4")));
 
         storage.clear();
         for (int i = 0; i < 10000; i++) {
@@ -68,16 +71,15 @@ public abstract class AbstractArrayStorageTest {
             }
         }
         Assert.assertThrows(StorageException.class, () -> storage.save(new Resume("over")));
-        Assert.assertThrows(ExistStorageException.class, () -> storage.save(new Resume("uuid1")));
         Assert.assertEquals(10000, storage.size());
     }
 
     @Test
     public void delete() throws Exception {
         Assert.assertThrows(NotExistStorageException.class, () -> storage.delete("wrong"));
-        storage.delete("uuid3");
+        storage.delete("uuid1");
         Assert.assertEquals(2, storage.size());
-        Assert.assertNull(storage.get("uuid3"));
+        Assert.assertThrows(NotExistStorageException.class, () -> storage.get("uuid1"));
     }
 
     @Test
