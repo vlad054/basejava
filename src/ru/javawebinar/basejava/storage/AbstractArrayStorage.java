@@ -22,7 +22,7 @@ public abstract class AbstractArrayStorage implements Storage {
 
         if (size >= STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", r.getUuid());
-        } else if (ind > 0) {
+        } else if (ind >= 0) {
             throw new ExistStorageException(r.getUuid());
         } else {
             saveResume(r, ind);
