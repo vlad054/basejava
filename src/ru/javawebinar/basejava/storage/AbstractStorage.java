@@ -5,9 +5,7 @@ import exception.NotExistStorageException;
 import exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
-public abstract class AbstractStorage implements Storage{
-
-//    protected Resume[] storage = new Resume[STORAGE_LIMIT];
+public abstract class AbstractStorage implements Storage {
 
     @Override
     public void save(Resume r) {
