@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
-    protected void saveResume(Resume r, int ind) {
+    protected void saveResumeArr(Resume r, int ind) {
         System.arraycopy(storage, -ind - 1, storage, -ind, size + ind + 1);
         storage[-ind - 1] = r;
     }
@@ -19,7 +19,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void deleteResume(int ind) {
+    protected void deleteResumeArr(int ind) {
         System.arraycopy(storage, ind + 1, storage, ind, size - ind + 1);
     }
 
