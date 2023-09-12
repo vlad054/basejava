@@ -35,7 +35,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         size++;
     }
 
-    protected void deleteResume(int i, String uuid) {
+    protected void deleteResume(int i) {
         deleteResumeArr(i);
         storage[size - 1] = null;
         size--;

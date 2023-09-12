@@ -3,9 +3,7 @@ package ru.javawebinar.basejava.storage;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 public class ListStorage extends AbstractStorage{
 
@@ -22,14 +20,8 @@ public class ListStorage extends AbstractStorage{
     }
 
     @Override
-    protected void deleteResume(int i, String uuid) {
-        Iterator<Resume> iterator = storage.iterator();
-        while (iterator.hasNext()){
-            Resume r = iterator.next();
-            if (Objects.equals(r , new Resume(uuid))){
-                iterator.remove();
-            }
-        }
+    protected void deleteResume(int i) {
+        storage.remove(i);
     }
 
     @Override
@@ -39,12 +31,12 @@ public class ListStorage extends AbstractStorage{
 
     @Override
     protected Resume getByIndex(int i) {
-        return (Resume) storage.toArray()[i];
+        return storage.get(i);
     }
 
     @Override
     protected void setByIndex(int i, Resume r) {
-        storage.toArray()[i] = r;
+        storage.set(i, r);
     }
 
     @Override
