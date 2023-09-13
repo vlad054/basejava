@@ -9,56 +9,60 @@ public abstract class AbstractStorage implements Storage {
 
     @Override
     public void save(Resume r) {
-        int ind = getIndex(r.getUuid());
-
+        Object searchKey = getNotExistingSearchKey(r.getUuid());
         if (isOverflow()) {
             throw new StorageException("Storage overflow", r.getUuid());
-        } else if (ind >= 0) {
-            throw new ExistStorageException(r.getUuid());
         } else {
-            saveResume(r, ind);
+            saveResume(r, searchKey);
         }
     }
 
     @Override
     public void delete(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        } else {
-            deleteResume(index);
-        }
+        Object searchKey = getExistingSearchKey(uuid);
+        deleteResume(searchKey);
     }
 
     @Override
     public Resume get(String uuid) {
-        int index = getIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-        return getByIndex(index);
+        Object searchKey = getExistingSearchKey(uuid);
+        return getByIndex((Integer)searchKey);
     }
 
     @Override
     public void update(Resume r) {
-        int index = getIndex(r.getUuid());
-        if (index < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        } else {
-            setByIndex(index, r);
-        }
+        Object searchKey = getExistingSearchKey(r.getUuid());
+        setByIndex((Integer)searchKey, r);
     }
 
-    protected abstract int getIndex(String uuid);
+    protected abstract Object getIndex(String uuid);
 
-    protected abstract void saveResume(Resume r, int i);
+    protected abstract void saveResume(Resume r, Object i);
 
-    protected abstract void deleteResume(int i);
+    protected abstract void deleteResume(Object i);
 
     protected abstract boolean isOverflow();
 
     protected abstract Resume getByIndex(int i);
 
     protected abstract void setByIndex(int i, Resume r);
+
+    protected abstract boolean isExist(Object o);
+
+    private Object getExistingSearchKey(String uuid) {
+        Object searchKey = getIndex(uuid);
+        if (!isExist(searchKey)) {
+            throw new NotExistStorageException(uuid);
+        }
+        return searchKey;
+    }
+
+    private Object getNotExistingSearchKey(String uuid) {
+        Object searchKey = getIndex(uuid);
+        if (isExist(searchKey)) {
+            throw new ExistStorageException(uuid);
+        }
+        return searchKey;
+    }
 
 }

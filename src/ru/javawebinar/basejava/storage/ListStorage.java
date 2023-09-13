@@ -4,24 +4,33 @@ import ru.javawebinar.basejava.model.Resume;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
-public class ListStorage extends AbstractStorage{
+public class ListStorage extends AbstractStorage {
 
     protected List<Resume> storage = new ArrayList<>();
 
     @Override
-    protected int getIndex(String uuid) {
-        return storage.indexOf(new Resume(uuid));
+    protected Integer getIndex(String uuid) {
+        ListIterator<Resume> iterator = storage.listIterator();
+        int ind;
+        while (iterator.hasNext()) {
+            ind = iterator.nextIndex();
+            if (iterator.next().getUuid().equals(uuid)) {
+                return ind;
+            }
+        }
+        return null;
     }
 
     @Override
-    protected void saveResume(Resume r, int i) {
+    protected void saveResume(Resume r, Object i) {
         storage.add(r);
     }
 
     @Override
-    protected void deleteResume(int i) {
-        storage.remove(i);
+    protected void deleteResume(Object i) {
+        storage.remove((int)i);
     }
 
     @Override
@@ -37,6 +46,11 @@ public class ListStorage extends AbstractStorage{
     @Override
     protected void setByIndex(int i, Resume r) {
         storage.set(i, r);
+    }
+
+    @Override
+    protected boolean isExist(Object o) {
+        return o != null;
     }
 
     @Override

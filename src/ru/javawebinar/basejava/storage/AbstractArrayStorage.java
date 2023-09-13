@@ -13,6 +13,11 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected int size = 0;
 
     @Override
+    protected boolean isExist(Object o) {
+        return (Integer)o >=0;
+    }
+
+    @Override
     public int size() {
         return size;
     }
@@ -28,15 +33,15 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    protected abstract int getIndex(String uuid);
+    protected abstract Integer getIndex(String uuid);
 
-    protected void saveResume(Resume r, int i) {
-        saveResumeArr(r, i);
+    protected void saveResume(Resume r, Object i) {
+        saveResumeArr(r, (Integer)i);
         size++;
     }
 
-    protected void deleteResume(int i) {
-        deleteResumeArr(i);
+    protected void deleteResume(Object i) {
+        deleteResumeArr((Integer)i);
         storage[size - 1] = null;
         size--;
     }
