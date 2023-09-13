@@ -26,13 +26,13 @@ public abstract class AbstractStorage implements Storage {
     @Override
     public Resume get(String uuid) {
         Object searchKey = getExistingSearchKey(uuid);
-        return getByIndex((Integer)searchKey);
+        return getByIndex(searchKey);
     }
 
     @Override
     public void update(Resume r) {
         Object searchKey = getExistingSearchKey(r.getUuid());
-        setByIndex((Integer)searchKey, r);
+        setByIndex(searchKey, r);
     }
 
     protected abstract Object getIndex(String uuid);
@@ -43,9 +43,9 @@ public abstract class AbstractStorage implements Storage {
 
     protected abstract boolean isOverflow();
 
-    protected abstract Resume getByIndex(int i);
+    protected abstract Resume getByIndex(Object o);
 
-    protected abstract void setByIndex(int i, Resume r);
+    protected abstract void setByIndex(Object i, Resume r);
 
     protected abstract boolean isExist(Object o);
 

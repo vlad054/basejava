@@ -52,13 +52,13 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    protected Resume getByIndex(int i) {
-        return storage[i];
+    protected Resume getByIndex(Object i) {
+        return storage[(int) i];
     }
 
     @Override
-    protected void setByIndex(int i, Resume r) {
-        storage[i] = r;
+    protected void setByIndex(Object o, Resume r) {
+        storage[(int) o] = r;
     }
 
     protected abstract void saveResumeArr(Resume r, int i);
