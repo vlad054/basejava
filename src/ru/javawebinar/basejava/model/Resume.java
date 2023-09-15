@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * ru.javawebinar.basejava.model.Resume class
  */
-public class Resume implements Comparable<Resume>{
+public class Resume {
 
     // Unique identifier
     private final String uuid;
@@ -42,8 +42,8 @@ public class Resume implements Comparable<Resume>{
         return uuid;
     }
 
-    @Override
-    public int compareTo(Resume o) {
-        return uuid.compareTo(o.uuid);
-    }
+//    @Override
+//    public int compareTo(Resume o) {
+//        return uuid.compareTo(o.uuid);
+//    }
 }
