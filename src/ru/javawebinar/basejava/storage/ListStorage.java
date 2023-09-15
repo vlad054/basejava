@@ -11,7 +11,7 @@ public class ListStorage extends AbstractStorage {
     protected List<Resume> storage = new ArrayList<>();
 
     @Override
-    protected Integer getIndex(String uuid) {
+    protected Integer getSearchKey(String uuid) {
         ListIterator<Resume> iterator = storage.listIterator();
         int ind;
         while (iterator.hasNext()) {
@@ -24,27 +24,22 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void saveResume(Resume r, Object i) {
+    protected void doSave(Resume r, Object i) {
         storage.add(r);
     }
 
     @Override
-    protected void deleteResume(Object i) {
+    protected void doDelete(Object i) {
         storage.remove((int) i);
     }
 
     @Override
-    protected boolean isOverflow() {
-        return false;
-    }
-
-    @Override
-    protected Resume getByIndex(Object i) {
+    protected Resume doGet(Object i) {
         return storage.get((int) i);
     }
 
     @Override
-    protected void setByIndex(Object i, Resume r) {
+    protected void doUpdate(Object i, Resume r) {
         storage.set((int) i, r);
     }
 

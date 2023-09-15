@@ -1,5 +1,6 @@
 package ru.javawebinar.basejava.storage;
 
+import exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
@@ -33,35 +34,39 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    protected abstract Integer getIndex(String uuid);
+    protected abstract Integer getSearchKey(String uuid);
 
-    protected void saveResume(Resume r, Object i) {
-        saveResumeArr(r, (Integer)i);
-        size++;
+    protected void doSave(Resume r, Object i) {
+
+        if (isOverflow()) {
+            throw new StorageException("Storage overflow", r.getUuid());
+        } else {
+            doSaveArr(r, (Integer)i);
+            size++;
+        }
     }
 
-    protected void deleteResume(Object i) {
-        deleteResumeArr((Integer)i);
+    protected void doDelete(Object i) {
+        doDeleteArr((Integer)i);
         storage[size - 1] = null;
         size--;
     }
 
-    @Override
     protected boolean isOverflow() {
         return size >= STORAGE_LIMIT;
     }
 
     @Override
-    protected Resume getByIndex(Object i) {
+    protected Resume doGet(Object i) {
         return storage[(int) i];
     }
 
     @Override
-    protected void setByIndex(Object o, Resume r) {
+    protected void doUpdate(Object o, Resume r) {
         storage[(int) o] = r;
     }
 
-    protected abstract void saveResumeArr(Resume r, int i);
+    protected abstract void doSaveArr(Resume r, int i);
 
-    protected abstract void deleteResumeArr(int i);
+    protected abstract void doDeleteArr(int i);
 }
