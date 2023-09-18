@@ -32,8 +32,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     @Override
     public List<Resume> getAllSorted() {
-        Resume[] resumes = Arrays.copyOfRange(storage, 0, size);
-        List<Resume> list = Arrays.asList(resumes);
+        List<Resume> list = Arrays.asList(Arrays.copyOfRange(storage, 0, size));
 
         list.sort((o1, o2) -> {
             if (o1.getFullName().equals(o2.getFullName())) {
@@ -43,7 +42,6 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         });
         return list;
     }
-
 
     protected abstract Integer getSearchKey(String uuid);
 
