@@ -7,6 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.javawebinar.basejava.model.Resume;
 
+import java.util.Arrays;
+import java.util.List;
+
 public abstract class AbstractStorageTest {
     private static final String UUID_1 = "uuid1";
     private static final String UUID_2 = "uuid2";
@@ -18,6 +21,10 @@ public abstract class AbstractStorageTest {
     protected static final Resume resume3 = new Resume(UUID_3);
     protected static final Resume resumeOver = new Resume(UUID_OVER);
 
+    private static final String NAME_1 = "NAME1";
+    private static final String NAME_2 = "NAME2";
+    private static final String NAME_3 = "NAME3";
+
     protected final Storage storage;
 
     public AbstractStorageTest(Storage storage) {
@@ -27,8 +34,11 @@ public abstract class AbstractStorageTest {
     @Before
     public void setUp() {
         storage.clear();
+        resume1.setFullName(NAME_1);
         storage.save(resume1);
+        resume2.setFullName(NAME_2);
         storage.save(resume2);
+        resume3.setFullName(NAME_3);
         storage.save(resume3);
     }
 
@@ -41,7 +51,7 @@ public abstract class AbstractStorageTest {
     public void clear() throws Exception {
         storage.clear();
         assertSize(0);
-        Assert.assertArrayEquals(new Resume[0], storage.getAll());
+        Assert.assertArrayEquals(new Resume[0], storage.getAllSorted().toArray());
     }
 
     @Test
@@ -51,9 +61,14 @@ public abstract class AbstractStorageTest {
     }
 
     @Test
-    public void getAll() throws Exception {
-        Resume[] expected = {resume1, resume2, resume3};
-        Assert.assertArrayEquals(expected, storage.getAll());
+    public void getAllStorage() throws Exception {
+        Resume[] exp = {resume1, resume2, resume3};
+        List<Resume> expected = Arrays.asList(exp);
+        List<Resume> actual = storage.getAllSorted();
+
+        Assert.assertEquals(expected.size(), actual.size());
+        Assert.assertTrue(expected.containsAll(actual));
+        Assert.assertTrue(actual.containsAll(expected));
     }
 
     @Test

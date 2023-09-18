@@ -4,6 +4,7 @@ import exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Array based storage for Resumes
@@ -15,7 +16,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     @Override
     protected boolean isExist(Object o) {
-        return (Integer)o >=0;
+        return (Integer) o >= 0;
     }
 
     @Override
@@ -30,9 +31,19 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume[] getAll() {
-        return Arrays.copyOfRange(storage, 0, size);
+    public List<Resume> getAllSorted() {
+        Resume[] resumes = Arrays.copyOfRange(storage, 0, size);
+        List<Resume> list = Arrays.asList(resumes);
+
+        list.sort((o1, o2) -> {
+            if (o1.getFullName().equals(o2.getFullName())) {
+                return o1.getUuid().compareTo(o2.getUuid());
+            }
+            return o1.getFullName().compareTo(o2.getFullName());
+        });
+        return list;
     }
+
 
     protected abstract Integer getSearchKey(String uuid);
 
@@ -41,13 +52,13 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         if (isOverflow()) {
             throw new StorageException("Storage overflow", r.getUuid());
         } else {
-            doSaveArr(r, (Integer)i);
+            doSaveArr(r, (Integer) i);
             size++;
         }
     }
 
     protected void doDelete(Object i) {
-        doDeleteArr((Integer)i);
+        doDeleteArr((Integer) i);
         storage[size - 1] = null;
         size--;
     }
