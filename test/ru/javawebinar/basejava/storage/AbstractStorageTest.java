@@ -11,19 +11,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractStorageTest {
-    private static final String UUID_1 = "uuid1";
-    private static final String UUID_2 = "uuid2";
-    private static final String UUID_3 = "uuid3";
-    private static final String UUID_OVER = "uuid_over";
+    private static final String NAME_1 = "name1";
+    private static final String NAME_2 = "name2";
+    private static final String NAME_3 = "name3";
+    private static final String NAME_OVER = "NAME_OVER";
 
-    protected static final Resume resume1 = new Resume(UUID_1);
-    protected static final Resume resume2 = new Resume(UUID_2);
-    protected static final Resume resume3 = new Resume(UUID_3);
-    protected static final Resume resumeOver = new Resume(UUID_OVER);
+    protected static final Resume resume1 = new Resume(NAME_1);
+    protected static final Resume resume2 = new Resume(NAME_2);
+    protected static final Resume resume3 = new Resume(NAME_3);
+    protected static final Resume resumeOver = new Resume(NAME_OVER);
 
-    private static final String NAME_1 = "NAME1";
-    private static final String NAME_2 = "NAME2";
-    private static final String NAME_3 = "NAME3";
+//    private static final String NAME_1 = "NAME1";
+//    private static final String NAME_2 = "NAME2";
+//    private static final String NAME_3 = "NAME3";
 
     protected final Storage storage;
 
@@ -34,11 +34,8 @@ public abstract class AbstractStorageTest {
     @Before
     public void setUp() {
         storage.clear();
-        resume1.setFullName(NAME_1);
         storage.save(resume1);
-        resume2.setFullName(NAME_2);
         storage.save(resume2);
-        resume3.setFullName(NAME_3);
         storage.save(resume3);
     }
 
@@ -57,7 +54,7 @@ public abstract class AbstractStorageTest {
     @Test
     public void update() throws Exception {
         storage.update(resume3);
-        Assert.assertEquals(resume3, storage.get(UUID_3));
+        Assert.assertEquals(resume3, storage.get(resume3.getUuid()));
     }
 
     @Test
@@ -80,8 +77,8 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void delete() throws Exception {
-        Assert.assertThrows(NotExistStorageException.class, () -> storage.delete(UUID_OVER));
-        storage.delete(UUID_1);
+        Assert.assertThrows(NotExistStorageException.class, () -> storage.delete(NAME_OVER));
+        storage.delete(resume1.getUuid());
         assertSize(2);
     }
 
@@ -94,7 +91,7 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void getNotExist() {
-        Assert.assertThrows(NotExistStorageException.class, () -> storage.get(UUID_OVER));
+        Assert.assertThrows(NotExistStorageException.class, () -> storage.get(NAME_OVER));
     }
 
     @Test
@@ -109,7 +106,7 @@ public abstract class AbstractStorageTest {
 
     @Test
     public void deleteNotExist() {
-        Assert.assertThrows(NotExistStorageException.class, () -> storage.delete(UUID_OVER));
+        Assert.assertThrows(NotExistStorageException.class, () -> storage.delete(NAME_OVER));
     }
 
     protected void assertSize(int s) {
