@@ -9,13 +9,7 @@ import java.util.List;
 
 public abstract class AbstractStorage implements Storage {
 
-    protected static final Comparator<Resume> RESUME_COMPARATOR = (o1, o2) ->
-    {
-        if (o1.getFullName().equals(o2.getFullName())) {
-            return o1.getUuid().compareTo(o2.getUuid());
-        }
-        return o1.getFullName().compareTo(o2.getFullName());
-    };
+    protected static final Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
 
     @Override
     public void save(Resume r) {
@@ -48,20 +42,6 @@ public abstract class AbstractStorage implements Storage {
         return list;
     }
 
-    protected abstract List<Resume> getList();
-
-    protected abstract Object getSearchKey(String uuid);
-
-    protected abstract void doSave(Resume r, Object searchKey);
-
-    protected abstract void doDelete(Object searchKey);
-
-    protected abstract Resume doGet(Object o);
-
-    protected abstract void doUpdate(Object searchKey, Resume r);
-
-    protected abstract boolean isExist(Object o);
-
     private Object getExistingSearchKey(String uuid) {
         Object searchKey = getSearchKey(uuid);
         if (!isExist(searchKey)) {
@@ -78,4 +58,17 @@ public abstract class AbstractStorage implements Storage {
         return searchKey;
     }
 
+    protected abstract List<Resume> getList();
+
+    protected abstract Object getSearchKey(String uuid);
+
+    protected abstract void doSave(Resume r, Object searchKey);
+
+    protected abstract void doDelete(Object searchKey);
+
+    protected abstract Resume doGet(Object o);
+
+    protected abstract void doUpdate(Object searchKey, Resume r);
+
+    protected abstract boolean isExist(Object o);
 }

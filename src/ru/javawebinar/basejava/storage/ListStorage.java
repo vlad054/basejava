@@ -62,9 +62,4 @@ public class ListStorage extends AbstractStorage {
     public int size() {
         return storage.size();
     }
-
-    public static void main(String[] args) {
-        ListStorage listStorage = new ListStorage();
-        System.out.println(listStorage.getAllSorted());
-    }
 }

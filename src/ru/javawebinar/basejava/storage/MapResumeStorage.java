@@ -38,10 +38,7 @@ public class MapResumeStorage extends AbstractStorage {
     @Override
     protected boolean isExist(Object o) {
         Resume resume = (Resume) o;
-        if (resume != null) {
-            return true;
-        }
-        return false;
+        return resume != null;
     }
 
     @Override
