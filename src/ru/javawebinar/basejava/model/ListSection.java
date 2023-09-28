@@ -1,9 +1,12 @@
 package ru.javawebinar.basejava.model;
 
-public class List extends AbstractSection {
+import java.util.Objects;
+
+public class ListSection extends AbstractSection {
     private final java.util.List<String> listSection;
 
-    public List(java.util.List<String> list) {
+    public ListSection(java.util.List<String> list) {
+        Objects.requireNonNull(list, "cant be null");
         this.listSection = list;
     }
 
@@ -14,11 +17,11 @@ public class List extends AbstractSection {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (getClass() != o.getClass()) return false;
 
-        List list = (List) o;
+        ListSection listSection = (ListSection) o;
 
-        return listSection.equals(list.listSection);
+        return this.listSection.equals(listSection.listSection);
     }
 
     @Override

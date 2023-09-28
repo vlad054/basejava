@@ -28,7 +28,7 @@ public class ResumeTestData{
                 "Реализация c нуля Rich Internet Application приложения на стеке технологий JPA, Spring, Spring-MVC, GWT, ExtGWT (GXT), Commet, HTML5, Highstock для алгоритмического трейдинга.",
                 "Создание JavaEE фреймворка для отказоустойчивого взаимодействия слабо-связанных сервисов (SOA-base архитектура, JAX-WS, JMS, AS Glassfish). Сбор статистики сервисов и информации о состоянии через систему мониторинга Nagios. Реализация онлайн клиента для администрирования и мониторинга системы по JMX (Jython/ Django).",
                 "Реализация протоколов по приему платежей всех основных платежных системы России (Cyberplat, Eport, Chronopay, Сбербанк), Белоруcсии(Erip, Osmp) и Никарагуа.");
-        resume.addSection(SectionType.ACHIEVEMENT, new List(listAch));
+        resume.addSection(SectionType.ACHIEVEMENT, new ListSection(listAch));
 
         java.util.List<String> listQual = Arrays.asList("JEE AS: GlassFish (v2.1, v3), OC4J, JBoss, Tomcat, Jetty, WebLogic, WSO2",
                 "Version control: Subversion, Git, Mercury, ClearCase, Perforce",
@@ -45,7 +45,7 @@ public class ResumeTestData{
                 "Отличное знание и опыт применения концепций ООП, SOA, шаблонов проектрирования, архитектурных шаблонов, UML, функционального программирования",
                 "Родной русский, английский \"upper intermediate\""
                 );
-        resume.addSection(SectionType.QUALIFICATIONS, new List(listQual));
+        resume.addSection(SectionType.QUALIFICATIONS, new ListSection(listQual));
 
         CompanySection sectionExp = new CompanySection();
 

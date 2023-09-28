@@ -2,17 +2,18 @@ package ru.javawebinar.basejava.model;
 
 import java.util.Objects;
 
-public class TextSection extends AbstractSection{
+public class TextSection extends AbstractSection {
     private String title;
 
-    public TextSection(String title){
+    public TextSection(String title) {
+        Objects.requireNonNull(title, "cant be null");
         this.title = title;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (getClass() != o.getClass()) return false;
 
         TextSection that = (TextSection) o;
 

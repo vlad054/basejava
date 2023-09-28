@@ -47,7 +47,7 @@
 - [Система управления версиями (VCS)](https://ru.wikipedia.org/wiki/Система_управления_версиями)
 - [Введение в Git: от установки до основных команд](https://tproger.ru/translations/beginner-git-cheatsheet/)
 - [Сравнение разных VCS](https://biz30.timedoctor.com/ru/cистема-контроля-версий/)
-- [Видео-уроки по Git](https://www.youtube.com/playlist?list=PLDyvV36pndZHkDRik6kKF6gSb0N0W995h)
+- [Видео-уроки по Git](https://www.youtube.com/playlist?listSection=PLDyvV36pndZHkDRik6kKF6gSb0N0W995h)
 - Интерактивные Git-обучалки: [1](https://githowto.com/ru), [2](http://learngitbranching.js.org)
 - [Официальная книга по Git](https://git-scm.com/book/ru/v2)
   
