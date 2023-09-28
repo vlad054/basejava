@@ -7,7 +7,7 @@ public class CompanySection extends AbstractSection {
 
     private final List<Company> positions = new ArrayList<>();
 
-    public void AddPosition(Company c) {
+    public void addPosition(Company c) {
         positions.add(c);
     }
 

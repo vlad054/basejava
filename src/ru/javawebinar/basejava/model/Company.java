@@ -7,14 +7,14 @@ import java.util.Objects;
 public class Company {
     private String name;
     private String webSite;
-    private List<Period> periods = new ArrayList<>();
+    private final List<Period> periods = new ArrayList<>();
 
     public Company(String name, String webSite) {
         this.name = name;
         this.webSite = webSite;
     }
 
-    public void AddPeriod(Period period){
+    public void addPeriod(Period period){
         periods.add(period);
     }
 

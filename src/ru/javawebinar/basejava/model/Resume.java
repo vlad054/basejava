@@ -10,8 +10,8 @@ public class Resume {
     // Unique identifier
     private final String uuid;
     private String fullName;
-    private Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-    private Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
 //        private SortedMap<SectionType, AbstractSection> sections = new TreeMap<>((o1, o2) -> o1.ordinal() - o2.ordinal());
 
     public Resume(String fullName) {
@@ -24,11 +24,11 @@ public class Resume {
         this.fullName = fullName;
     }
 
-    public void AddContact(ContactType c, String s) {
+    public void addContact(ContactType c, String s) {
         contacts.put(c, s);
     }
 
-    public void AddSection(SectionType c, AbstractSection s) {
+    public void addSection(SectionType c, AbstractSection s) {
         sections.put(c, s);
     }
 
