@@ -9,6 +9,7 @@ import ru.javawebinar.basejava.model.Resume;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class AbstractStorageTest {
     private static final String NAME_1 = "name1";
@@ -16,14 +17,16 @@ public abstract class AbstractStorageTest {
     private static final String NAME_3 = "name3";
     private static final String NAME_OVER = "NAME_OVER";
 
-    protected static final Resume resume1 = new Resume(NAME_1);
-    protected static final Resume resume2 = new Resume(NAME_2);
-    protected static final Resume resume3 = new Resume(NAME_3);
-    protected static final Resume resumeOver = new Resume(NAME_OVER);
+//    protected static final Resume resume1 = new Resume(NAME_1);
+//    protected static final Resume resume2 = new Resume(NAME_2);
+//    protected static final Resume resume3 = new Resume(NAME_3);
+//    protected static final Resume resumeOver = new Resume(NAME_OVER);
 
-//    private static final String NAME_1 = "NAME1";
-//    private static final String NAME_2 = "NAME2";
-//    private static final String NAME_3 = "NAME3";
+    protected static final Resume resume1 = ResumeTestData.fillResume(UUID.randomUUID().toString(),NAME_1);
+    protected static final Resume resume2 = ResumeTestData.fillResume(UUID.randomUUID().toString(),NAME_2);
+    protected static final Resume resume3 = ResumeTestData.fillResume(UUID.randomUUID().toString(),NAME_3);
+    protected static final Resume resumeOver = ResumeTestData.fillResume(UUID.randomUUID().toString(),NAME_OVER);
+
 
     protected final Storage storage;
 

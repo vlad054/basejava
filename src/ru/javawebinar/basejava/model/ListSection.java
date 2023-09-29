@@ -17,7 +17,7 @@ public class ListSection extends AbstractSection {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         ListSection listSection = (ListSection) o;
 
