@@ -46,7 +46,9 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
     @Override
     protected void doSave(Resume r, File file) {
         try {
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                throw new StorageException("IO error", file.getName());
+            }
             doWrite(r, file);
         } catch (IOException e) {
             throw new StorageException("IO error", file.getName(), e);
@@ -55,10 +57,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
 
     @Override
     protected void doDelete(File file) {
-        try {
-            file.delete();
-        } catch (Exception e) {
-            throw new StorageException("IO error", file.getName(), e);
+        if (!file.delete()){
+            throw new StorageException("IO error", file.getName());
         }
     }
 
@@ -92,10 +92,8 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
             throw new StorageException("IO error", directory.getName());
         }
         for (File f : files) {
-            try {
-                f.delete();
-            } catch (Exception e) {
-                throw new StorageException("IO error", f.getName(), e);
+            if (!f.delete()){
+                throw new StorageException("IO error", f.getName());
             }
         }
     }
@@ -107,7 +105,7 @@ public abstract class AbstractFileStorage extends AbstractStorage<File> {
         if (list == null) {
             throw new StorageException("IO error", directory.getName());
         }
-        return directory.list().length;
+        return list.length;
     }
 
     protected abstract void doWrite(Resume r, File file) throws IOException;
