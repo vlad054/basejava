@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.javawebinar.basejava.model.Resume;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,8 @@ public abstract class AbstractStorageTest {
 //    protected static final Resume resume2 = new Resume(NAME_2);
 //    protected static final Resume resume3 = new Resume(NAME_3);
 //    protected static final Resume resumeOver = new Resume(NAME_OVER);
+
+    protected static final File STORAGE_DIR = new File("C:\\obuch\\java\\basejava\\out\\tt");
 
     protected static final Resume resume1 = ResumeTestData.fillResume(UUID.randomUUID().toString(),NAME_1);
     protected static final Resume resume2 = ResumeTestData.fillResume(UUID.randomUUID().toString(),NAME_2);
