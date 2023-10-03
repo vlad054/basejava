@@ -32,18 +32,25 @@ public class MainFile {
 
         System.out.println("-------------------");
         dir = new File("./basejava/src");
-        readFile(dir);
+        readFile(dir, 0);
     }
 
-    public static void readFile(File file){
-        int ind = 1;
+    public static void readFile(File file, int ind){
 
+        System.out.print("-".repeat(ind));
         if (file.isDirectory()){
+//            System.out.print(" ".repeat(ind));
+//            System.out.print(" ");
+//            System.out.print("-".repeat(ind));
+//            System.out.print("-".repeat(ind));
             System.out.println(file.getName().toUpperCase());
             for (File f : file.listFiles()){
-                readFile(f);
+//                System.out.print("-".repeat(ind));
+//                System.out.print(" ".repeat(ind));
+                readFile(f, ind+1);
             }
         } else {
+//            System.out.print("-".repeat(ind+1));
             System.out.println(file.getName());
         }
     }
