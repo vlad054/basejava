@@ -50,7 +50,7 @@ public abstract class AbstractPathStorage extends AbstractStorage<Path> {
 //        } catch(IOException e){
 //           throw new StorageException("IO error", file.getName());
 //        }
-       doUpdate(file, r);
+        doUpdate(file, r);
     }
 
     @Override
