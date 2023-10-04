@@ -39,18 +39,11 @@ public class MainFile {
 
         System.out.print("-".repeat(ind));
         if (file.isDirectory()){
-//            System.out.print(" ".repeat(ind));
-//            System.out.print(" ");
-//            System.out.print("-".repeat(ind));
-//            System.out.print("-".repeat(ind));
             System.out.println(file.getName().toUpperCase());
             for (File f : file.listFiles()){
-//                System.out.print("-".repeat(ind));
-//                System.out.print(" ".repeat(ind));
                 readFile(f, ind+1);
             }
         } else {
-//            System.out.print("-".repeat(ind+1));
             System.out.println(file.getName());
         }
     }
