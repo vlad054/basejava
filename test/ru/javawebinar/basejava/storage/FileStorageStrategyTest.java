@@ -3,7 +3,7 @@ package ru.javawebinar.basejava.storage;
 public class FileStorageStrategyTest extends AbstractStorageTest {
 
         public FileStorageStrategyTest() {
-            super(new FileStorage(STORAGE_DIR, new StorageFileStrategy()));
+            super(new FileStorageWithStrategy(STORAGE_DIR, new StreamStorageStrategy()));
         }
 }
 

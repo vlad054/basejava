@@ -5,7 +5,7 @@ import ru.javawebinar.basejava.model.Resume;
 
 import java.io.*;
 
-public class StorageFileStrategy implements StorageStrategy {
+public class StreamStorageStrategy implements StorageStrategy{
 
     @Override
     public void doWrite(Resume r, OutputStream os) throws IOException {
