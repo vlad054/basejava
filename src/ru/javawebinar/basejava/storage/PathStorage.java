@@ -2,21 +2,25 @@ package ru.javawebinar.basejava.storage;
 
 import exception.StorageException;
 import ru.javawebinar.basejava.model.Resume;
+import ru.javawebinar.basejava.storage.strategy.StorageStrategy;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
-public class PathStorageWithStrategy extends AbstractStorage<Path> {
+public class PathStorage extends AbstractStorage<Path> {
 
     private final Path directory;
     private final StorageStrategy strategy;
 
-    protected PathStorageWithStrategy(String dir, StorageStrategy storageStrategy) {
+    protected PathStorage(String dir, StorageStrategy storageStrategy) {
         directory = Paths.get(dir);
 
         Objects.requireNonNull(directory, "directory must not be null");
@@ -32,12 +36,9 @@ public class PathStorageWithStrategy extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> getList() {
+//        return getListPaths().map(this::doGet).toList();
         List<Resume> list = new ArrayList<>();
-        try {
-            Files.list(directory).forEach(path -> list.add(doGet(path)));
-        } catch (IOException e) {
-            throw new StorageException("IO error", directory.toString());
-        }
+        getListPaths().forEach(path -> list.add(doGet(path)));
         return list;
     }
 
@@ -85,19 +86,19 @@ public class PathStorageWithStrategy extends AbstractStorage<Path> {
 
     @Override
     public void clear() {
-        try {
-            Files.list(directory).forEach(this::doDelete);
-        } catch (IOException e) {
-            throw new StorageException("IO error", null);
-        }
+        getListPaths().forEach(this::doDelete);
     }
 
     @Override
     public int size() {
+        return (int) getListPaths().count();
+    }
+
+    private Stream<Path> getListPaths() {
         try {
-            return (int) Files.list(directory).count();
+            return Files.list(directory);
         } catch (IOException e) {
-            throw new StorageException("IO error", directory.toString());
+            throw new StorageException("IO error", null);
         }
     }
 }
