@@ -28,7 +28,8 @@ public class Resume implements Serializable {
         return contacts;
     }
 
-    public Resume(){}
+    public Resume() {
+    }
 
     public Resume(String fullName) {
         this.uuid = UUID.randomUUID().toString();
@@ -48,22 +49,9 @@ public class Resume implements Serializable {
         sections.put(c, s);
     }
 
-//    public String toString(){
-//        return "name = " + fullName ;
-//    }
-
     public String getUuid() {
         return uuid;
     }
-
-//
-
-
-
-//    @Override
-//    public String toString() {
-//        return uuid;
-//    }
 
     public String getFullName() {
         return fullName;
@@ -90,10 +78,6 @@ public class Resume implements Serializable {
         return Objects.hash(uuid, fullName, contacts, sections);
     }
 
-    //    @Override
-//    public int compareTo(Resume o) {
-//        return uuid.compareTo(o.uuid);
-//    }
     @Override
     public String toString() {
         String str = fullName + "\n";

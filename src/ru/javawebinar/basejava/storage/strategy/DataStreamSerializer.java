@@ -31,14 +31,11 @@ public class DataStreamSerializer implements StreamSerializer {
                 switch (m.getKey()) {
                     case ACHIEVEMENT, QUALIFICATIONS -> {
 //                        ((ListSection)section).getListSection().stream().forEach(str1 -> dos.writeUTF(str1));
-                        dos.writeInt(((ListSection) section).getListSection().size());
-                        ((ListSection) section).getListSection().stream().forEach(str -> {
-                            try {
-                                dos.writeUTF(str);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
+                        List<String> stringList = ((ListSection) section).getListSection();
+                        dos.writeInt(stringList.size());
+                        for (String str : stringList) {
+                            dos.writeUTF(str);
+                        }
                     }
                     case EDUCATION, EXPERIENCE -> {
                         List<Company> companies = ((CompanySection) section).getPositions();
@@ -46,24 +43,18 @@ public class DataStreamSerializer implements StreamSerializer {
                         for (Company company : companies) {
                             dos.writeUTF(company.getName());
                             dos.writeUTF(getStringNull(company.getWebSite()));
-                            dos.writeInt(company.getPeriods().size());
-                            company.getPeriods().stream().forEach(period -> {
-                                try {
-                                    dos.writeUTF(period.getName());
-                                    dos.writeUTF(getStringNull(period.getDescription()));
-                                    dos.writeUTF(period.getStartDate().toString());
-                                    dos.writeUTF(period.getEndDate() == null ? "now" : period.getEndDate().toString());
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
+                            List<Period> periodList = company.getPeriods();
+                            dos.writeInt(periodList.size());
+                            for (Period period : periodList) {
+                                dos.writeUTF(period.getName());
+                                dos.writeUTF(getStringNull(period.getDescription()));
+                                dos.writeUTF(period.getStartDate().toString());
+                                dos.writeUTF(period.getEndDate() == null ? "now" : period.getEndDate().toString());
+                            }
                         }
                     }
-                    case OBJECTIVE, PERSONAL -> {
-                        dos.writeUTF(((TextSection) section).getTitle());
-                    }
+                    case OBJECTIVE, PERSONAL -> dos.writeUTF(((TextSection) section).getTitle());
                 }
-                ;
             }
         }
     }
@@ -104,9 +95,8 @@ public class DataStreamSerializer implements StreamSerializer {
                         }
                         resume.addSection(sectionType, companySection);
                     }
-                } ;
+                }
             }
-            System.out.println(resume.toString());
             return resume;
         }
     }
