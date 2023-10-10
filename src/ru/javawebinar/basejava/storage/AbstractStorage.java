@@ -4,10 +4,15 @@ import exception.ExistStorageException;
 import exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.Resume;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractStorage<SK> implements Storage {
 
     private static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());

@@ -1,15 +1,20 @@
 package ru.javawebinar.basejava.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private String webSite;
     private final List<Period> periods = new ArrayList<>();
+
+    public Company(){}
 
     public Company(String name, String webSite) {
         Objects.requireNonNull(name , "cant be null");

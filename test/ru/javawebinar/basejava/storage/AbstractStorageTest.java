@@ -60,6 +60,9 @@ public abstract class AbstractStorageTest {
     @Test
     public void update() throws Exception {
         storage.update(resume3);
+        Resume r = storage.get(resume3.getUuid());
+        System.out.println(r.toString());
+        System.out.println(resume3.toString());
         Assert.assertEquals(resume3, storage.get(resume3.getUuid()));
     }
 
