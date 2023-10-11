@@ -5,10 +5,33 @@ import ru.javawebinar.basejava.model.*;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class DataStreamSerializer implements StreamSerializer {
+
+    private interface WriteConsumer<T> {
+        void doWrite(T t, DataOutputStream dataOutputStream) throws IOException;
+    }
+
+    private <T> void writeWithException(Collection<T> collection, DataOutputStream dataOutputStream, WriteConsumer<T> loopConsumer) throws IOException {
+        for (T t : collection) {
+            loopConsumer.doWrite(t, dataOutputStream);
+        }
+    }
+
+    private String getStringNull(String str) {
+        return str == null ? "-" : str;
+    }
+
+    private String setStringNull(String str) {
+        return str.equals("-") ? null : str;
+    }
+
+    private LocalDate setDateNull(String str) {
+        return str.equals("now") ? null : LocalDate.parse(str);
+    }
 
     @Override
     public void doWrite(Resume r, OutputStream os) throws IOException {
@@ -18,46 +41,48 @@ public class DataStreamSerializer implements StreamSerializer {
 
             Map<ContactType, String> contacts = r.getContacts();
             dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, String> m : contacts.entrySet()) {
-                dos.writeUTF(m.getKey().name());
-                dos.writeUTF(m.getValue());
-            }
+
+            writeWithException(contacts.entrySet(), dos, (contactTypeStringEntry, dataOutputStream) -> {
+                dataOutputStream.writeUTF(contactTypeStringEntry.getKey().name());
+                dataOutputStream.writeUTF(contactTypeStringEntry.getValue());
+            });
 
             Map<SectionType, AbstractSection> sections = r.getSections();
             dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, AbstractSection> m : sections.entrySet()) {
-                dos.writeUTF(m.getKey().name());
-                AbstractSection section = m.getValue();
-                switch (m.getKey()) {
+
+            writeWithException(sections.entrySet(), dos, (sectionTypeStringEntry, dataOutputStream) -> {
+                dataOutputStream.writeUTF(sectionTypeStringEntry.getKey().name());
+                AbstractSection section = sectionTypeStringEntry.getValue();
+                switch (sectionTypeStringEntry.getKey()) {
+                    case OBJECTIVE, PERSONAL -> dataOutputStream.writeUTF(((TextSection) section).getTitle());
                     case ACHIEVEMENT, QUALIFICATIONS -> {
-//                        ((ListSection)section).getListSection().stream().forEach(str1 -> dos.writeUTF(str1));
                         List<String> stringList = ((ListSection) section).getListSection();
-                        dos.writeInt(stringList.size());
-                        for (String str : stringList) {
-                            dos.writeUTF(str);
-                        }
+                        dataOutputStream.writeInt(stringList.size());
+                        writeWithException(stringList, dataOutputStream, (s, dataOutputStream3) -> dataOutputStream3.writeUTF(s));
                     }
                     case EDUCATION, EXPERIENCE -> {
                         List<Company> companies = ((CompanySection) section).getPositions();
-                        dos.writeInt(companies.size());
-                        for (Company company : companies) {
-                            dos.writeUTF(company.getName());
-                            dos.writeUTF(getStringNull(company.getWebSite()));
+                        dataOutputStream.writeInt(companies.size());
+
+                        writeWithException(companies, dataOutputStream, (company, dataOutputStream1) -> {
+                            dataOutputStream1.writeUTF(company.getName());
+                            dataOutputStream1.writeUTF(getStringNull(company.getWebSite()));
                             List<Period> periodList = company.getPeriods();
-                            dos.writeInt(periodList.size());
-                            for (Period period : periodList) {
-                                dos.writeUTF(period.getName());
-                                dos.writeUTF(getStringNull(period.getDescription()));
-                                dos.writeUTF(period.getStartDate().toString());
-                                dos.writeUTF(period.getEndDate() == null ? "now" : period.getEndDate().toString());
-                            }
-                        }
+                            dataOutputStream1.writeInt(periodList.size());
+
+                            writeWithException(periodList, dataOutputStream1, (period, dataOutputStream2) -> {
+                                dataOutputStream2.writeUTF(period.getName());
+                                dataOutputStream2.writeUTF(getStringNull(period.getDescription()));
+                                dataOutputStream2.writeUTF(period.getStartDate().toString());
+                                dataOutputStream2.writeUTF(period.getEndDate() == null ? "now" : period.getEndDate().toString());
+                            });
+                        });
                     }
-                    case OBJECTIVE, PERSONAL -> dos.writeUTF(((TextSection) section).getTitle());
-                }
-            }
-        }
+                };
+            });
+        };
     }
+
 
     @Override
     public Resume doRead(InputStream is) throws IOException {
@@ -100,17 +125,4 @@ public class DataStreamSerializer implements StreamSerializer {
             return resume;
         }
     }
-
-    private String getStringNull(String str) {
-        return str == null ? "-" : str;
-    }
-
-    private String setStringNull(String str) {
-        return str.equals("-") ? null : str;
-    }
-
-    private LocalDate setDateNull(String str) {
-        return str.equals("now") ? null : LocalDate.parse(str);
-    }
-
 }
