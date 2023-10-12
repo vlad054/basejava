@@ -19,35 +19,35 @@ public class DataStreamSerializer implements StreamSerializer {
 
             Map<ContactType, String> contacts = r.getContacts();
 
-            writeWithException(contacts.entrySet(), dos, (contactTypeStringEntry, dataOutputStream) -> {
-                dataOutputStream.writeUTF(contactTypeStringEntry.getKey().name());
-                dataOutputStream.writeUTF(contactTypeStringEntry.getValue());
+            writeWithException(contacts.entrySet(), dos, (contactTypeStringEntry) -> {
+                dos.writeUTF(contactTypeStringEntry.getKey().name());
+                dos.writeUTF(contactTypeStringEntry.getValue());
             });
 
             Map<SectionType, AbstractSection> sections = r.getSections();
 
-            writeWithException(sections.entrySet(), dos, (sectionTypeStringEntry, dataOutputStream) -> {
-                dataOutputStream.writeUTF(sectionTypeStringEntry.getKey().name());
+            writeWithException(sections.entrySet(), dos, (sectionTypeStringEntry) -> {
+                dos.writeUTF(sectionTypeStringEntry.getKey().name());
                 AbstractSection section = sectionTypeStringEntry.getValue();
                 switch (sectionTypeStringEntry.getKey()) {
-                    case OBJECTIVE, PERSONAL -> dataOutputStream.writeUTF(((TextSection) section).getTitle());
+                    case OBJECTIVE, PERSONAL -> dos.writeUTF(((TextSection) section).getTitle());
                     case ACHIEVEMENT, QUALIFICATIONS -> {
                         List<String> stringList = ((ListSection) section).getListSection();
-                        writeWithException(stringList, dataOutputStream, (s, dataOutputStream3) -> dataOutputStream3.writeUTF(s));
+                        writeWithException(stringList, dos, dos::writeUTF);
                     }
                     case EDUCATION, EXPERIENCE -> {
                         List<Company> companies = ((CompanySection) section).getPositions();
 
-                        writeWithException(companies, dataOutputStream, (company, dataOutputStream1) -> {
-                            dataOutputStream1.writeUTF(company.getName());
-                            dataOutputStream1.writeUTF(getStringNull(company.getWebSite()));
+                        writeWithException(companies, dos, (company) -> {
+                            dos.writeUTF(company.getName());
+                            dos.writeUTF(getStringNull(company.getWebSite()));
                             List<Period> periodList = company.getPeriods();
 
-                            writeWithException(periodList, dataOutputStream1, (period, dataOutputStream2) -> {
-                                dataOutputStream2.writeUTF(period.getName());
-                                dataOutputStream2.writeUTF(getStringNull(period.getDescription()));
-                                dataOutputStream2.writeUTF(period.getStartDate().toString());
-                                dataOutputStream2.writeUTF(period.getEndDate() == null ? "now" : period.getEndDate().toString());
+                            writeWithException(periodList, dos, (period) -> {
+                                dos.writeUTF(period.getName());
+                                dos.writeUTF(getStringNull(period.getDescription()));
+                                dos.writeUTF(period.getStartDate().toString());
+                                dos.writeUTF(period.getEndDate() == null ? "now" : period.getEndDate().toString());
                             });
                         });
                     }
@@ -61,30 +61,28 @@ public class DataStreamSerializer implements StreamSerializer {
         try (DataInputStream dis = new DataInputStream(is)) {
             Resume resume = new Resume(dis.readUTF(), dis.readUTF());
 
-            readWithException(resume, dis, (r, dataInputStream) ->
-                    r.addContact(ContactType.valueOf(dataInputStream.readUTF()), dataInputStream.readUTF()));
+            readWithException(dis, () ->
+                    resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF()));
 
-            readWithException(resume, dis, (resume1, dataInputStream) -> {
-                SectionType sectionType = SectionType.valueOf(dataInputStream.readUTF());
+            readWithException(dis, () -> {
+                SectionType sectionType = SectionType.valueOf(dis.readUTF());
                 switch (sectionType) {
-                    case OBJECTIVE, PERSONAL ->
-                            resume1.addSection(sectionType, new TextSection(dataInputStream.readUTF()));
+                    case OBJECTIVE, PERSONAL -> resume.addSection(sectionType, new TextSection(dis.readUTF()));
                     case ACHIEVEMENT, QUALIFICATIONS -> {
                         List<String> list = new ArrayList<>();
-                        readWithException(list, dataInputStream, (list1, dataInputStream1) -> list1.add(dataInputStream1.readUTF()));
-                        resume1.addSection(sectionType, new ListSection(list));
+                        readWithException(dis, () -> list.add(dis.readUTF()));
+                        resume.addSection(sectionType, new ListSection(list));
                     }
                     case EDUCATION, EXPERIENCE -> {
                         CompanySection companySection = new CompanySection();
-                        readWithException(companySection, dataInputStream, (companySection1, dataInputStream12) -> {
-                            Company company = new Company(dataInputStream12.readUTF(), setStringNull(dataInputStream12.readUTF()));
-
-                            readWithException(company, dataInputStream12, (company1, dataInputStream13) ->
-                                    company1.addPeriod(new Period(dataInputStream13.readUTF(), setStringNull(dataInputStream13.readUTF()),
-                                            LocalDate.parse(dataInputStream13.readUTF()), setDateNull(dataInputStream13.readUTF()))));
-                            companySection1.addPosition(company);
+                        readWithException(dis, () -> {
+                            Company company = new Company(dis.readUTF(), setStringNull(dis.readUTF()));
+                            readWithException(dis, () ->
+                                    company.addPeriod(new Period(dis.readUTF(), setStringNull(dis.readUTF()),
+                                            LocalDate.parse(dis.readUTF()), setDateNull(dis.readUTF()))));
+                            companySection.addPosition(company);
                         });
-                        resume1.addSection(sectionType, companySection);
+                        resume.addSection(sectionType, companySection);
                     }
                 }
             });
@@ -94,25 +92,25 @@ public class DataStreamSerializer implements StreamSerializer {
 
     @FunctionalInterface
     private interface WriteConsumer<T> {
-        void doWrite(T t, DataOutputStream dataOutputStream) throws IOException;
+        void doWrite(T t) throws IOException;
     }
 
     @FunctionalInterface
-    private interface ReadConsumer<T> {
-        void doRead(T t, DataInputStream dataInputStream) throws IOException;
+    private interface ReadConsumer {
+        void doRead() throws IOException;
     }
 
-    private <T> void readWithException(T t, DataInputStream dataInputStream, ReadConsumer<T> loopConsumer) throws IOException {
+    private void readWithException(DataInputStream dataInputStream, ReadConsumer loopConsumer) throws IOException {
         int collectionSize = dataInputStream.readInt();
         for (int i = 0; i < collectionSize; i++) {
-            loopConsumer.doRead(t, dataInputStream);
+            loopConsumer.doRead();
         }
     }
 
     private <T> void writeWithException(Collection<T> collection, DataOutputStream dataOutputStream, WriteConsumer<T> loopConsumer) throws IOException {
         dataOutputStream.writeInt(collection.size());
         for (T t : collection) {
-            loopConsumer.doWrite(t, dataOutputStream);
+            loopConsumer.doWrite(t);
         }
     }
 
