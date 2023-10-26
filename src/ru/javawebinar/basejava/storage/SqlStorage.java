@@ -28,7 +28,7 @@ public class SqlStorage implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        return sqlHelper.<Resume>execute("SELECT * FROM resume r WHERE r.uuid =?", ps -> {
+        return sqlHelper.execute("SELECT * FROM resume r WHERE r.uuid =?", ps -> {
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
@@ -52,10 +52,10 @@ public class SqlStorage implements Storage {
 
     @Override
     public void save(Resume r) {
-            sqlHelper.execute("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
+        sqlHelper.execute("INSERT INTO resume (uuid, full_name) VALUES (?,?)", ps -> {
             ps.setString(1, r.getUuid());
             ps.setString(2, r.getFullName());
-            ps.executeUpdate();
+            ps.execute();
             return null;
         });
     }
@@ -66,14 +66,14 @@ public class SqlStorage implements Storage {
             ps.setString(1, uuid);
             if (ps.executeUpdate() == 0) {
                 throw new NotExistStorageException(uuid);
-            };
+            }
             return null;
         });
     }
 
     @Override
     public List<Resume> getAllSorted() {
-        return sqlHelper.<List<Resume>>execute("SELECT * FROM resume ORDER BY 1,2", ps -> {
+        return sqlHelper.execute("SELECT * FROM resume ORDER BY 1,2", ps -> {
             ResultSet rs = ps.executeQuery();
             List<Resume> list = new ArrayList<>();
             while (rs.next()) {
@@ -87,17 +87,14 @@ public class SqlStorage implements Storage {
     public int size() {
         return sqlHelper.<Integer>execute("SELECT count(uuid) FROM resume", ps -> {
             ResultSet rs = ps.executeQuery();
-            if (!rs.next()) {
-                throw new SQLException();
-            }
-            return rs.getInt(1);
+            return !rs.next() ? 0 : rs.getInt(1);
         });
     }
 
-    public class SqlHelper {
-        private ConnectionFactory connectionFactory;
+    public static class SqlHelper {
+        private final ConnectionFactory connectionFactory;
 
-        public SqlHelper(String dbUrl, String dbUser, String dbPassword){
+        public SqlHelper(String dbUrl, String dbUser, String dbPassword) {
             connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
         }
 
@@ -107,7 +104,7 @@ public class SqlStorage implements Storage {
                     PreparedStatement ps = conn.prepareStatement(query)) {
                 return blockCode.execute(ps);
             } catch (SQLException e) {
-                if ("23505".equals(e.getSQLState())){
+                if ("23505".equals(e.getSQLState())) {
                     throw new ExistStorageException("Exist row in DB");
                 }
                 throw new StorageException(e);
@@ -115,7 +112,7 @@ public class SqlStorage implements Storage {
         }
     }
 
-    public interface BlockCode<T>{
-         T execute(PreparedStatement preparedStatement) throws SQLException;
+    public interface BlockCode<T> {
+        T execute(PreparedStatement preparedStatement) throws SQLException;
     }
 }
