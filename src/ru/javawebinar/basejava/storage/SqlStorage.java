@@ -9,7 +9,7 @@ import ru.javawebinar.basejava.sql.ConnectionFactory;
 import ru.javawebinar.basejava.sql.SqlTransaction;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,11 +40,7 @@ public class SqlStorage implements Storage {
             }
             Resume r = new Resume(uuid, rs.getString("full_name"));
             do {
-                String value = rs.getString("value");
-                if (value != null) {
-                    ContactType type = ContactType.valueOf(rs.getString("type"));
-                    r.addContact(type, value);
-                }
+                addContact(r, rs.getString("value"), rs.getString("type"));
             } while (rs.next());
             return r;
         });
@@ -52,7 +48,8 @@ public class SqlStorage implements Storage {
 
     @Override
     public void update(Resume r) {
-        execContactQuery(r, "UPDATE resume SET full_name=? WHERE uuid=?", "UPDATE contact SET value=? WHERE type=? and resume_uuid=?");
+        delete(r.getUuid());
+        save(r);
     }
 
     @Override
@@ -75,25 +72,19 @@ public class SqlStorage implements Storage {
     public List<Resume> getAllSorted() {
         return sqlHelper.execute("SELECT r.uuid, r.full_name, c.type, c.value FROM resume r LEFT JOIN contact c ON r.uuid = c.resume_uuid ORDER BY r.uuid, r.full_name", ps -> {
             ResultSet rs = ps.executeQuery();
-            List<Resume> list = new ArrayList<>();
-            String uuid = "-1";
             Resume r = new Resume();
+            Map<String, Resume> resumeMap = new HashMap<>();
 
             while (rs.next()) {
-                if (rs.getString(1).equals(uuid)) {
-                    String value = rs.getString("value");
-                    ContactType type = ContactType.valueOf(rs.getString("type"));
-                    r.addContact(type, value);
-                } else {
-                    uuid = rs.getString(1);
-                    r = new Resume(uuid, rs.getString(2));
-                    String value = rs.getString("value");
-                    ContactType type = ContactType.valueOf(rs.getString("type"));
-                    r.addContact(type, value);
-                    list.add(r);
+                r = resumeMap.get(rs.getString("uuid"));
+
+                if (r == null) {
+                    r = new Resume(rs.getString("uuid"), rs.getString("full_name"));
+                    resumeMap.put(rs.getString("uuid"), r);
                 }
+                addContact(r, rs.getString("value"), rs.getString("type"));
             }
-            return list;
+            return resumeMap.values().stream().toList();
         });
     }
 
@@ -171,5 +162,12 @@ public class SqlStorage implements Storage {
                     return null;
                 }
         );
+    }
+
+    private void addContact(Resume r, String value, String type) {
+        if (value != null) {
+            ContactType contactType = ContactType.valueOf(type);
+            r.addContact(contactType, value);
+        }
     }
 }
