@@ -1,14 +1,13 @@
 package ru.javawebinar.basejava.storage;
 
-import exception.ExistStorageException;
 import exception.NotExistStorageException;
-import exception.StorageException;
 import ru.javawebinar.basejava.model.ContactType;
 import ru.javawebinar.basejava.model.Resume;
-import ru.javawebinar.basejava.sql.ConnectionFactory;
-import ru.javawebinar.basejava.sql.SqlTransaction;
+import ru.javawebinar.basejava.sql.SqlHelper;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,9 @@ public class SqlStorage implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        return sqlHelper.execute("SELECT r.uuid, r.full_name, c.type, c.value FROM resume r" +
-                " LEFT JOIN contact c ON r.uuid = c.resume_uuid WHERE r.uuid =?", ps -> {
+        return sqlHelper.execute("SELECT r.uuid, r.full_name, c.type, c.value " +
+                " FROM resume r LEFT JOIN contact c ON r.uuid = c.resume_uuid " +
+                " WHERE r.uuid =?", ps -> {
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
@@ -48,13 +48,19 @@ public class SqlStorage implements Storage {
 
     @Override
     public void update(Resume r) {
-        delete(r.getUuid());
-        save(r);
+        sqlHelper.execute("DELETE FROM contact c WHERE c.resume_uuid =?", ps -> {
+            ps.setString(1, r.getUuid());
+            if (ps.executeUpdate() == 0) {
+                throw new NotExistStorageException(r.getUuid());
+            }
+            return null;
+        });
+        execContactQuery(r, null);
     }
 
     @Override
     public void save(Resume r) {
-        execContactQuery(r, "INSERT INTO resume (full_name, uuid) VALUES (?,?)", "INSERT INTO contact (value, type, resume_uuid) VALUES (?,?,?)");
+        execContactQuery(r, "INSERT INTO resume (full_name, uuid) VALUES (?,?)");
     }
 
     @Override
@@ -70,9 +76,11 @@ public class SqlStorage implements Storage {
 
     @Override
     public List<Resume> getAllSorted() {
-        return sqlHelper.execute("SELECT r.uuid, r.full_name, c.type, c.value FROM resume r LEFT JOIN contact c ON r.uuid = c.resume_uuid ORDER BY r.uuid, r.full_name", ps -> {
+        return sqlHelper.execute("SELECT r.uuid, r.full_name, c.type, c.value" +
+                " FROM resume r LEFT JOIN contact c ON r.uuid = c.resume_uuid " +
+                " ORDER BY r.uuid, r.full_name", ps -> {
             ResultSet rs = ps.executeQuery();
-            Resume r = new Resume();
+            Resume r;
             Map<String, Resume> resumeMap = new HashMap<>();
 
             while (rs.next()) {
@@ -96,58 +104,22 @@ public class SqlStorage implements Storage {
         });
     }
 
-    public static class SqlHelper {
-        private final ConnectionFactory connectionFactory;
-
-        public SqlHelper(String dbUrl, String dbUser, String dbPassword) {
-            connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-        }
-
-        public <T> T execute(String query, BlockCode<T> blockCode) {
-            try (
-                    Connection conn = connectionFactory.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(query)) {
-                return blockCode.execute(ps);
-            } catch (SQLException e) {
-                if ("23505".equals(e.getSQLState())) {
-                    throw new ExistStorageException("Exist row in DB");
-                }
-                throw new StorageException(e);
-            }
-        }
-
-        public <T> T transactionalExecute(SqlTransaction<T> executor) {
-            try (Connection conn = connectionFactory.getConnection()) {
-                try {
-                    conn.setAutoCommit(false);
-                    T res = executor.execute(conn);
-                    conn.commit();
-                    return res;
-                } catch (SQLException e) {
-                    conn.rollback();
-                    if ("23505".equals(e.getSQLState())) {
-                        throw new ExistStorageException("Exist row in DB");
-                    }
-                    throw new StorageException(e);
-                }
-            } catch (SQLException e) {
-                throw new StorageException(e);
-            }
-        }
-    }
-
     public interface BlockCode<T> {
         T execute(PreparedStatement preparedStatement) throws SQLException;
     }
 
-    private void execContactQuery(Resume r, String query, String queryContact) {
+    private void execContactQuery(Resume r, String query) {
+
+        String queryContact = "INSERT INTO contact (value, type, resume_uuid) VALUES (?,?,?)";
 
         sqlHelper.transactionalExecute(conn -> {
-                    try (PreparedStatement ps = conn.prepareStatement(query)) {
-                        ps.setString(1, r.getFullName());
-                        ps.setString(2, r.getUuid());
-                        if (ps.executeUpdate() == 0) {
-                            throw new NotExistStorageException(r.getUuid());
+                    if (query != null) {
+                        try (PreparedStatement ps = conn.prepareStatement(query)) {
+                            ps.setString(1, r.getFullName());
+                            ps.setString(2, r.getUuid());
+                            if (ps.executeUpdate() == 0) {
+                                throw new NotExistStorageException(r.getUuid());
+                            }
                         }
                     }
                     try (PreparedStatement ps = conn.prepareStatement(queryContact)) {
