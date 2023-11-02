@@ -97,7 +97,6 @@ public class SqlStorage implements Storage {
                                             """,
                 ps -> {
                     ResultSet rs = ps.executeQuery();
-//                    Resume r;
                     final Map<String, Resume> resumeMap = new LinkedHashMap<>();
 
                     while (rs.next()) {
