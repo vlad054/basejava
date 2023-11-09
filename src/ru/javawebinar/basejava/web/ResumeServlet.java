@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class ResumeServlet extends HttpServlet {
 
-    private final Storage storage = Config.getStorage();
+    private final Storage storage = Config.get().getStorage();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
 

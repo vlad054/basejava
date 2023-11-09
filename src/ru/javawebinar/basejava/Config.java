@@ -13,9 +13,9 @@ public class Config {
     private static final File PROPS = new File("config\\resumes.properties");
     private static final Config INSTANCE = new Config();
 
-    private Properties props = new Properties();
-    private File storageDir;
-    private static SqlStorage storage;
+    private final Properties props = new Properties();
+    private final File storageDir;
+    private final SqlStorage storage;
 
     private Config() {
         try (InputStream is = new FileInputStream(PROPS)) {
@@ -42,7 +42,7 @@ public class Config {
         return INSTANCE;
     }
 
-    public static Storage getStorage() {
+    public Storage getStorage() {
         return storage;
     }
 }
