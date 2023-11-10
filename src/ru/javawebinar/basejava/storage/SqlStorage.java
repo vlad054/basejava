@@ -48,27 +48,16 @@ public class SqlStorage implements Storage {
                                 """
                 , ps -> {
                     ps.setString(1, uuid);
-//                    ps.setString(2, uuid);
 
                     ResultSet rs = ps.executeQuery();
                     if (!rs.next()) {
                         throw new NotExistStorageException(uuid);
                     }
                     Resume r = new Resume(uuid, rs.getString("full_name"));
-
                     do {
                         addContact(r, rs);
                         addSection(r, rs);
                     } while (rs.next());
-
-
-//                    do {
-//                        if (rs.getString("typein").equals("contact")) {
-//                            addContact(r, rs.getString("value"), rs.getString("type"));
-//                        } else if (rs.getString("typein").equals("section")) {
-//                            addSection(r, rs.getString("value"), rs.getString("type"));
-//                        }
-//                    } while (rs.next());
                     return r;
                 });
     }
