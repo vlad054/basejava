@@ -2,7 +2,6 @@ package ru.javawebinar.basejava.sql;
 
 import exception.ExistStorageException;
 import exception.StorageException;
-import ru.javawebinar.basejava.storage.SqlStorage;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +16,7 @@ public class SqlHelper {
         connectionFactory = () -> DriverManager.getConnection(dbUrl, dbUser, dbPassword);
     }
 
-    public <T> T execute(String query, SqlStorage.BlockCode<T> blockCode) {
+    public <T> T execute(String query, BlockCode<T> blockCode) {
         try (
                 Connection conn = connectionFactory.getConnection();
                 PreparedStatement ps = conn.prepareStatement(query)) {
@@ -48,4 +47,9 @@ public class SqlHelper {
             throw new StorageException(e);
         }
     }
+
+    public interface BlockCode<T> {
+        T execute(PreparedStatement preparedStatement) throws SQLException;
+    }
+
 }
