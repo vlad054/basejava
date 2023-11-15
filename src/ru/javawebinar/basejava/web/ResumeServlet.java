@@ -40,9 +40,10 @@ public class ResumeServlet extends HttpServlet {
         for (SectionType type : SectionType.values()) {
             String value = request.getParameter(type.name());
             if (value != null && value.trim().length() != 0) {
-                switch (type){
+                switch (type) {
                     case OBJECTIVE, PERSONAL -> r.addSection(type, new TextSection(value.trim()));
-                    case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(type, new ListSection(List.of(value.split("\\n"))));
+                    case ACHIEVEMENT, QUALIFICATIONS ->
+                            r.addSection(type, new ListSection(List.of(value.split("\\n"))));
                 }
             }
         }
@@ -55,7 +56,7 @@ public class ResumeServlet extends HttpServlet {
         String uuid = request.getParameter("uuid");
         String action = request.getParameter("action");
 
-        if (action == null){
+        if (action == null) {
             request.setAttribute("resumes", storage.getAllSorted());
             request.getRequestDispatcher("list.jsp").forward(request, response);
             return;
@@ -69,7 +70,7 @@ public class ResumeServlet extends HttpServlet {
                 return;
             }
             case "view", "edit" -> {
-                if (uuid == null){
+                if (uuid == null) {
                     r = new Resume("");
                     storage.save(r);
                 } else {
@@ -82,72 +83,5 @@ public class ResumeServlet extends HttpServlet {
         request.getRequestDispatcher(
                 ("view".equals(action) ? "view.jsp" : "edit.jsp")
         ).forward(request, response);
-
-//        request.setAttribute("resumes", storage.getAllSorted());
-//        request.getRequestDispatcher("list.jsp").forward(request, response);
-
-//        request.setCharacterEncoding("UTF-8");
-//        response.setCharacterEncoding("UTF-8");
-//        response.setContentType("text/html; charset=UTF-8");
-//        response.getWriter().write("""
-//                <!DOCTYPE html>
-//                <html>
-//                <head>
-//                <style>
-//                table {
-//                  font-family: arial, sans-serif;
-//                  border-collapse: collapse;
-//                  width: 100%;
-//                }
-//
-//                td, th {
-//                  border: 1px solid #dddddd;
-//                  text-align: left;
-//                  padding: 8px;
-//                }
-//
-//                tr:nth-child(even) {
-//                  background-color: #dddddd;
-//                }
-//                </style>
-//                </head>
-//                <body>
-//
-//                <h2>Resume Table</h2>
-//                <table>
-//                    <tr>
-//                        <th>
-//                            Name
-//                        </th>
-//                        <th>
-//                            Email
-//                        </th>
-//                    </tr>
-//                """);
-//
-//        for (Resume r : storage.getAllSorted()) {
-//            response.getWriter().write("""
-//                    <tr>
-//                        <th>
-//                        """
-//                    + r.getFullName() +
-//                    """
-//                            </th>
-//                            <th>
-//                            """
-//                    + r.getContacts().get(ContactType.MAIL) +
-//                    """
-//                                </th>
-//                            </tr>
-//                            """
-//            );
-//
-//        }
-//        response.getWriter().write("""
-//                </table>
-//                </body>
-//                </html>
-//                """);
-//    }
     }
 }
