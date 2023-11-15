@@ -34,7 +34,16 @@ public class ListSection extends AbstractSection {
     public String toString() {
         String str = "";
         for (String s : listSection) {
-            str = str + "-" + s + "\n";
+            str = str + s + "\n";
+        }
+        return str;
+    }
+
+    @Override
+    public String toHtml() {
+        String str = "<br>";
+        for (String c : listSection) {
+            str = str + " - " + c + " <br> ";
         }
         return str;
     }

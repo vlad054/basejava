@@ -1,7 +1,7 @@
 package ru.javawebinar.basejava.web;
 
 import ru.javawebinar.basejava.Config;
-import ru.javawebinar.basejava.model.Resume;
+import ru.javawebinar.basejava.model.*;
 import ru.javawebinar.basejava.storage.Storage;
 
 import javax.servlet.ServletConfig;
@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -22,64 +23,131 @@ public class ResumeServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        String uuid = request.getParameter("uuid");
+        String fullName = request.getParameter("fullName");
+        Resume r = storage.get(uuid);
+        r.setFullName(fullName);
+        for (ContactType type : ContactType.values()) {
+            String value = request.getParameter(type.name());
+            if (value != null && value.trim().length() != 0) {
+                r.addContact(type, value);
+            } else {
+                r.getContacts().remove(type);
+            }
+        }
 
+        for (SectionType type : SectionType.values()) {
+            String value = request.getParameter(type.name());
+            if (value != null && value.trim().length() != 0) {
+                switch (type){
+                    case OBJECTIVE, PERSONAL -> r.addSection(type, new TextSection(value.trim()));
+                    case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(type, new ListSection(List.of(value.split("\\n"))));
+                }
+            }
+        }
+        storage.update(r);
+        response.sendRedirect("resume");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws javax.servlet.ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write("""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                <style>
-                table {
-                  font-family: arial, sans-serif;
-                  border-collapse: collapse;
-                  width: 100%;
-                }
-                                
-                td, th {
-                  border: 1px solid #dddddd;
-                  text-align: left;
-                  padding: 8px;
-                }
-                                
-                tr:nth-child(even) {
-                  background-color: #dddddd;
-                }
-                </style>
-                </head>
-                <body>
-                                
-                <h2>Resume Table</h2>
-                <table>
-                """);
+        String uuid = request.getParameter("uuid");
+        String action = request.getParameter("action");
 
-        for (Resume r : storage.getAllSorted()) {
-            response.getWriter().write("""
-                    <tr>
-                        <th>
-                        """
-                    + r.getUuid() +
-                    """
-                            </th>
-                            <th>
-                            """
-                    + r.getFullName() +
-                    """
-                                </th>
-                            </tr>
-                            """
-            );
-
+        if (action == null){
+            request.setAttribute("resumes", storage.getAllSorted());
+            request.getRequestDispatcher("list.jsp").forward(request, response);
+            return;
         }
-        response.getWriter().write("""
-                </table>
-                </body>
-                </html>
-                """);
+
+        Resume r;
+        switch (action) {
+            case "delete" -> {
+                storage.delete(uuid);
+                response.sendRedirect("resume");
+                return;
+            }
+            case "view", "edit" -> {
+                if (uuid == null){
+                    r = new Resume("");
+                    storage.save(r);
+                } else {
+                    r = storage.get(uuid);
+                }
+            }
+            default -> throw new IllegalArgumentException("Action " + action + " is illegal");
+        }
+        request.setAttribute("resume", r);
+        request.getRequestDispatcher(
+                ("view".equals(action) ? "view.jsp" : "edit.jsp")
+        ).forward(request, response);
+
+//        request.setAttribute("resumes", storage.getAllSorted());
+//        request.getRequestDispatcher("list.jsp").forward(request, response);
+
+//        request.setCharacterEncoding("UTF-8");
+//        response.setCharacterEncoding("UTF-8");
+//        response.setContentType("text/html; charset=UTF-8");
+//        response.getWriter().write("""
+//                <!DOCTYPE html>
+//                <html>
+//                <head>
+//                <style>
+//                table {
+//                  font-family: arial, sans-serif;
+//                  border-collapse: collapse;
+//                  width: 100%;
+//                }
+//
+//                td, th {
+//                  border: 1px solid #dddddd;
+//                  text-align: left;
+//                  padding: 8px;
+//                }
+//
+//                tr:nth-child(even) {
+//                  background-color: #dddddd;
+//                }
+//                </style>
+//                </head>
+//                <body>
+//
+//                <h2>Resume Table</h2>
+//                <table>
+//                    <tr>
+//                        <th>
+//                            Name
+//                        </th>
+//                        <th>
+//                            Email
+//                        </th>
+//                    </tr>
+//                """);
+//
+//        for (Resume r : storage.getAllSorted()) {
+//            response.getWriter().write("""
+//                    <tr>
+//                        <th>
+//                        """
+//                    + r.getFullName() +
+//                    """
+//                            </th>
+//                            <th>
+//                            """
+//                    + r.getContacts().get(ContactType.MAIL) +
+//                    """
+//                                </th>
+//                            </tr>
+//                            """
+//            );
+//
+//        }
+//        response.getWriter().write("""
+//                </table>
+//                </body>
+//                </html>
+//                """);
+//    }
     }
 }

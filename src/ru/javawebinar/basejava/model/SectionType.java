@@ -8,7 +8,7 @@ public enum SectionType {
     EXPERIENCE("Опыт работы"),
     EDUCATION("Образование");
 
-    private String title;
+    private final String title;
 
     SectionType(String title) {
         this.title = title;
@@ -16,5 +16,21 @@ public enum SectionType {
 
     public String getTitle() {
         return title;
+    }
+
+    private String toHtml0(String value) {
+        return title + ": " + value;
+    }
+
+    public String toHtml(String value) {
+        return (value == null) ? "" : toHtml0(value);
+    }
+
+    public String toLink(String href) {
+        return toLink(href, title);
+    }
+
+    public static String toLink(String href, String title) {
+        return "<a href='" + href + "'>" + title + "</a>";
     }
 }

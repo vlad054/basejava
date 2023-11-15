@@ -36,4 +36,8 @@ public class TextSection extends AbstractSection {
     public String toString() {
         return title;
     }
+    @Override
+    public String toHtml() {
+        return " - " + title + " <br> ";
+    }
 }

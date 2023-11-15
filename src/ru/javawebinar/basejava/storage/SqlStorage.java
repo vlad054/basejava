@@ -3,6 +3,7 @@ package ru.javawebinar.basejava.storage;
 import exception.NotExistStorageException;
 import ru.javawebinar.basejava.model.*;
 import ru.javawebinar.basejava.sql.SqlHelper;
+import ru.javawebinar.basejava.util.JsonParser;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,33 +34,34 @@ public class SqlStorage implements Storage {
 
     @Override
     public Resume get(String uuid) {
-        return sqlHelper.execute("""
-                        SELECT r.full_name,
-                                c.value AS contact_value,
-                                c.type  AS contact_type,
-                                s.value AS section_value,
-                                s.type  AS section_type
-                             FROM resume r
-                        LEFT JOIN contact c
-                               ON r.uuid = c.resume_uuid
-                        LEFT JOIN section s
-                               ON r.uuid = s.resume_uuid
-                            WHERE r.uuid = ?
-                                """
-                , ps -> {
-                    ps.setString(1, uuid);
+        return sqlHelper.transactionalExecute(conn -> {
+            Resume r;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume WHERE uuid =?")) {
+                ps.setString(1, uuid);
+                ResultSet rs = ps.executeQuery();
+                if (!rs.next()) {
+                    throw new NotExistStorageException(uuid);
+                }
+                r = new Resume(uuid, rs.getString("full_name"));
+            }
 
-                    ResultSet rs = ps.executeQuery();
-                    if (!rs.next()) {
-                        throw new NotExistStorageException(uuid);
-                    }
-                    Resume r = new Resume(uuid, rs.getString("full_name"));
-                    do {
-                        addContact(r, rs);
-                        addSection(r, rs);
-                    } while (rs.next());
-                    return r;
-                });
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM contact WHERE resume_uuid =?")) {
+                ps.setString(1, uuid);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    addContact(r, rs);
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM section WHERE resume_uuid =?")) {
+                ps.setString(1, uuid);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    addSection(r, rs);
+                }
+            }
+            return r;
+        });
     }
 
     @Override
@@ -115,7 +117,7 @@ public class SqlStorage implements Storage {
                 conn -> {
                     final Map<String, Resume> resumeMap = new LinkedHashMap<>();
 
-                    try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume")) {
+                    try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume order by full_name, uuid")) {
                         final ResultSet rs = ps.executeQuery();
                         while (rs.next()) {
                             final String uuid = rs.getString("uuid");
@@ -124,7 +126,7 @@ public class SqlStorage implements Storage {
                     }
 
                     try (PreparedStatement ps = conn.prepareStatement(
-                            "SELECT resume_uuid, value AS contact_value, type AS contact_type FROM contact")) {
+                            "SELECT resume_uuid, value AS value, type AS type FROM contact")) {
                         final ResultSet rs = ps.executeQuery();
                         while (rs.next()) {
                             final Resume r = resumeMap.get(rs.getString("resume_uuid"));
@@ -133,7 +135,7 @@ public class SqlStorage implements Storage {
                     }
 
                     try (PreparedStatement ps = conn.prepareStatement(
-                            "SELECT resume_uuid, value AS section_value, type AS section_type FROM section")) {
+                            "SELECT resume_uuid, value AS value, type AS type FROM section")) {
                         final ResultSet rs = ps.executeQuery();
                         while (rs.next()) {
                             final Resume r = resumeMap.get(rs.getString("resume_uuid"));
@@ -155,36 +157,25 @@ public class SqlStorage implements Storage {
     }
 
     private void addContact(Resume r, ResultSet rs) throws SQLException {
-        final String value = rs.getString("contact_value");
+        final String value = rs.getString("value");
         if (value != null) {
-            r.addContact(ContactType.valueOf(rs.getString("contact_type")), value);
+            r.addContact(ContactType.valueOf(rs.getString("type")), value);
         }
     }
 
     private void addSection(Resume r,  ResultSet rs) throws SQLException {
-        final String value = rs.getString("section_value");
+        final String value = rs.getString("value");
         if (value != null) {
-            SectionType sectionType = SectionType.valueOf(rs.getString("section_type"));
+            SectionType sectionType = SectionType.valueOf(rs.getString("type"));
 
-            switch (sectionType) {
-                case OBJECTIVE, PERSONAL -> r.addSection(sectionType, new TextSection(value));
-                case ACHIEVEMENT, QUALIFICATIONS -> r.addSection(sectionType, new ListSection(Arrays.asList(value.split("\n"))));
-            }
+            r.addSection(sectionType, JsonParser.read(value, AbstractSection.class));
         }
     }
 
     private void insertSections(Resume r, Connection conn) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement("INSERT INTO section (value, type, resume_uuid) VALUES (?,?,?)")) {
             for (Map.Entry<SectionType, AbstractSection> e : r.getSections().entrySet()) {
-
-                switch (e.getKey()) {
-                    case OBJECTIVE, PERSONAL -> ps.setString(1, e.getValue().toString());
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        ListSection listSection = (ListSection) e.getValue();
-                        String str = String.join("\n", listSection.getListSection());
-                        ps.setString(1, str);
-                    }
-                }
+                ps.setString(1, JsonParser.write(e.getValue(), AbstractSection.class));
                 ps.setString(2, e.getKey().name());
                 ps.setString(3, r.getUuid());
                 ps.addBatch();

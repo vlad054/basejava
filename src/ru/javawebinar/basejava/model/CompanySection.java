@@ -41,4 +41,13 @@ public class CompanySection extends AbstractSection {
         }
         return str;
     }
+
+    @Override
+    public String toHtml() {
+        String str = "<br>";
+        for (Company c : positions) {
+            str = str + " - " +  c.toString() + " <br> ";
+        }
+        return str;
+    }
 }
