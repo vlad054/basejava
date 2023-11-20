@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -46,6 +48,29 @@ public class ResumeServlet extends HttpServlet {
                     case ACHIEVEMENT, QUALIFICATIONS ->
                             r.addSection(type, new ListSection(List.of(value.replaceAll("\r\n\r\n|\n\n","\r\n").split("\\n"))));
                     case EXPERIENCE, EDUCATION -> setSection(r, value, type);
+                }
+            }
+        }
+
+        if (request.getParameter("sectionName") != null) {
+            SectionType newsectionType = SectionType.valueOf(request.getParameter("sectionName"));
+            if (request.getParameter("companyName") != null){
+                Company  company = new Company(request.getParameter("companyName"), request.getParameter("companyWeb"));
+
+                CompanySection companySection = (CompanySection) r.getSections().get(newsectionType);
+                if (companySection == null) {
+                    r.getSections().put(newsectionType, new CompanySection());
+                    companySection = (CompanySection) r.getSections().get(newsectionType);
+                }
+                companySection.addPosition(company);
+                if (request.getParameter("periodName") != null &&
+                        request.getParameter("periodStartDate") != null &&
+                        request.getParameter("periodDesc") != null ){
+                    company.addPeriod( new Period(request.getParameter("periodName"),request.getParameter("periodDesc"),
+                            LocalDate.parse(request.getParameter("periodStartDate"), DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                            !Objects.equals(request.getParameter("periodEndDate"), "") ?LocalDate.parse(request.getParameter("periodEndDate"), DateTimeFormatter.ofPattern("dd/MM/yyyy")):null));
+
+                    r.addSection(newsectionType, companySection);
                 }
             }
         }
