@@ -16,7 +16,7 @@
         <input type="hidden" name="uuid" value="${resume.uuid}">
         <dl>
             <dt>Имя:</dt>
-            <dd><input type="text" name="fullName" size=50 value="${resume.fullName}"></dd>
+            <dd><input type="text" name="fullName" required size=50 value="${resume.fullName}"></dd>
         </dl>
         <h3>Контакты:</h3>
         <c:forEach var="type" items="<%=ContactType.values()%>">
@@ -32,11 +32,32 @@
                 <dt>${type.title}</dt>
                 <dd>
                     <label>
-                    <textarea cols="100" rows="10" name="${type.name()}" >${resume.getSections().get(type)}</textarea>
+                    <textarea
+                    cols="100" rows="10" name="${type.name()}" >${resume.getSections().get(type)}</textarea>
                     </label>
                 </dd>
+
             </dl>
         </c:forEach>
+
+
+        <h3>Добавить секцию :</h3>
+        <dd><label> Section Name <input list="sections" name="sectionName" required size=50>
+            <datalist id="sections">
+                <option value=${SectionType.EXPERIENCE.name()}></option>
+                <option value=${SectionType.EDUCATION.name()}></option>
+            </datalist>
+        </label></dd> <br>
+        <dd><label> Company Name <input type="text" title="Company Name" name="companyName" required size=50></label></dd> <br>
+        <dd><label> Company Web <input type="text" title="Company Web" name="companyWeb" size=50></label></dd> <br>
+        <dd><label> Period Name <input type="text" title="Period Name" name="periodName" required size=50></label></dd> <br>
+        <dd><label> Period start Date <input type="text" title="Period start Date dd/mm/yyyy" name="periodStartDate" required size=50></label></dd> <br>
+        <dd><label> Period end Date <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDate"  size=50></label></dd> <br>
+        <label title="Section Descripion"> Description
+                <textarea
+                        cols="100" rows="10" name="periodDesc" ></textarea>
+        </label>
+        <br>
         <hr>
         <button type="submit">Сохранить</button>
         <button type="button" onclick="window.history.back()">Отменить</button>
