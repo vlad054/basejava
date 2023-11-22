@@ -44,6 +44,13 @@ public class ResumeServlet extends HttpServlet {
 
         for (SectionType type : SectionType.values()) {
             String value = request.getParameter(type.name());
+            if (value == null || value.trim().isEmpty()) {
+                switch (type) {
+                    case EXPERIENCE -> value = mapParam.get("companyPNameX")[0];
+                    case EDUCATION -> value = mapParam.get("companyPNameE")[0];
+                }
+            }
+
             if (value != null && !value.trim().isEmpty()) {
                 switch (type) {
                     case OBJECTIVE, PERSONAL -> r.addSection(type, new TextSection(value.trim()));
@@ -100,6 +107,10 @@ public class ResumeServlet extends HttpServlet {
                              String[] arrPeriod, String[] arrPeriodStart, String[] arrPeriodEnd, String[] arrDesc){
 
         CompanySection companySection = (CompanySection)r.getSections().get(type);
+        if (companySection == null) {
+            companySection = new CompanySection();
+            r.addSection(type, companySection);
+        }
         companySection.getPositions().clear();
 
         for (int i=0; i < arrCompanyName.length; i++) {

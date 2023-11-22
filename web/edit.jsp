@@ -28,7 +28,6 @@
 
         <h3>Секции:</h3>
         <c:forEach var="type" items="<%=SectionType.values()%>">
-            <dd><input type="hidden" name="${type.name()}" size=30 value="${resume.getSections().get(type)}"></dd>
             <c:if test="${type.name() != 'EXPERIENCE' && type.name() != 'EDUCATION'}">
                 <dl>
                     <dt><b>${type.title}</b></dt>
@@ -39,7 +38,6 @@
                         cols="100" rows="10" name="${type.name()}" >${resume.getSections().get(type)}</textarea>
                         </label>
                     </dd>
-
             </c:if>
 
             <c:if test="${type.name() == 'EXPERIENCE'}">
@@ -89,7 +87,7 @@
                         <dd><label> Ссылка <input type="text" title="Company Web" name="companyPWebE" value="${company.getWebSite()}" size=50></label></dd> <br>
                         <dd><label> Позиция <input type="text" title="Period Name" name="periodNameE" value="${period.getName()}" required size=50></label></dd> <br>
                         <dd><label> Нач. <input type="text" title="Period start Date dd/mm/yyyy" name="periodStartDateE" value="${period.getStartDate()}" required size=10></label> /
-                            <label> Кон. <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDateE" value="${period.getEndDate()}" size=10></label></dd> <br>
+                            <label> Кон. <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDateE" value="${empty period.getEndDate()?'Сейчас': period.getEndDate()}" size=10></label></dd> <br>
                         <br>
                     </c:forEach>
                     <br>
