@@ -34,6 +34,14 @@ public class CompanySection extends AbstractSection {
         return positions;
     }
 
+    public List<String> getPositionNames() {
+        List<String> ret = new ArrayList<>();
+        for (Company company : positions){
+            ret.add(company.getName());
+        }
+        return ret;
+    }
+
     public String toString() {
         String str = "";
         for (Company c : positions) {

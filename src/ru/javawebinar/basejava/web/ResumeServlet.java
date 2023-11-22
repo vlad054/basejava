@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -40,6 +40,8 @@ public class ResumeServlet extends HttpServlet {
             }
         }
 
+        Map<String, String[]> mapParam =  request.getParameterMap();
+
         for (SectionType type : SectionType.values()) {
             String value = request.getParameter(type.name());
             if (value != null && !value.trim().isEmpty()) {
@@ -47,30 +49,12 @@ public class ResumeServlet extends HttpServlet {
                     case OBJECTIVE, PERSONAL -> r.addSection(type, new TextSection(value.trim()));
                     case ACHIEVEMENT, QUALIFICATIONS ->
                             r.addSection(type, new ListSection(List.of(value.replaceAll("\r\n\r\n|\n\n","\r\n").split("\\n"))));
-                    case EXPERIENCE, EDUCATION -> setSection(r, value, type);
-                }
-            }
-        }
-
-        if (request.getParameter("sectionName") != null) {
-            SectionType newsectionType = SectionType.valueOf(request.getParameter("sectionName"));
-            if (request.getParameter("companyName") != null){
-                Company  company = new Company(request.getParameter("companyName"), request.getParameter("companyWeb"));
-
-                CompanySection companySection = (CompanySection) r.getSections().get(newsectionType);
-                if (companySection == null) {
-                    r.getSections().put(newsectionType, new CompanySection());
-                    companySection = (CompanySection) r.getSections().get(newsectionType);
-                }
-                companySection.addPosition(company);
-                if (request.getParameter("periodName") != null &&
-                        request.getParameter("periodStartDate") != null &&
-                        request.getParameter("periodDesc") != null ){
-                    company.addPeriod( new Period(request.getParameter("periodName"),request.getParameter("periodDesc"),
-                            LocalDate.parse(request.getParameter("periodStartDate"), DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                            !Objects.equals(request.getParameter("periodEndDate"), "") ?LocalDate.parse(request.getParameter("periodEndDate"), DateTimeFormatter.ofPattern("dd/MM/yyyy")):null));
-
-                    r.addSection(newsectionType, companySection);
+                    case EXPERIENCE ->         fillSection(r, SectionType.EXPERIENCE, mapParam.get("companyPNameX"), mapParam.get("companyPWebX"),
+                            mapParam.get("periodNameX"), mapParam.get("periodStartDateX"),
+                            mapParam.get("periodEndDateX"), mapParam.get("periodDescX"));
+                    case EDUCATION ->         fillSection(r, SectionType.EDUCATION, mapParam.get("companyPNameE"), mapParam.get("companyPWebE"),
+                            mapParam.get("periodNameE"), mapParam.get("periodStartDateE"),
+                            mapParam.get("periodEndDateE"), null);
                 }
             }
         }
@@ -112,35 +96,22 @@ public class ResumeServlet extends HttpServlet {
         ).forward(request, response);
     }
 
-    //strong data format
-    private void setSection(Resume r, String value, SectionType type){
-        int s = (type == SectionType.EXPERIENCE)?2:1;
-        List<String> sectionList = List.of(value.trim().split("\r\n\r\n"));
-        if (!sectionList.isEmpty()) {
-            CompanySection companySection = new CompanySection();
-            for (String str : sectionList) {
-                String[] arrStr = str.split("\r\n");
-                Company company = new Company(arrStr[0], null);
-                for (int i=1; i < arrStr.length; i = i + s){
-                    LocalDate startDate = LocalDate.of(Integer.parseInt(arrStr[i].substring(3,7))
-                            , Integer.parseInt(arrStr[i].substring(0,2)),
-                            1);
-                    LocalDate endDate;
-                    if (arrStr[i].substring(7).contains("/")){
-                        endDate = LocalDate.of(Integer.parseInt(arrStr[i].substring(11,15))
-                                , Integer.parseInt(arrStr[i].substring(8,10)),
-                                1);
-                    } else {
-                        endDate = null;
-                    }
-                    String desc = null;
-                    String name = arrStr[i].substring(15).trim();
-                    if (type==SectionType.EXPERIENCE) { desc = arrStr[i+1].trim();}
-                    company.addPeriod(new Period(name, desc, startDate, endDate));
-                }
+    private void fillSection(Resume r, SectionType type, String[] arrCompanyName, String[] arrWeb,
+                             String[] arrPeriod, String[] arrPeriodStart, String[] arrPeriodEnd, String[] arrDesc){
+
+        CompanySection companySection = (CompanySection)r.getSections().get(type);
+        companySection.getPositions().clear();
+
+        for (int i=0; i < arrCompanyName.length; i++) {
+            String companyName = arrCompanyName[i];
+            if (!companyName.isEmpty()) {
+                Company company = new Company(arrCompanyName[i], arrWeb[i]);
                 companySection.addPosition(company);
+
+                company.addPeriod(new Period(arrPeriod[i], (arrDesc != null) ? arrDesc[i] : null,
+                        LocalDate.parse(arrPeriodStart[i], DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                        (!arrPeriodEnd[i].isEmpty() && !arrPeriodEnd[i].equals("Сейчас")) ? LocalDate.parse(arrPeriodEnd[i], DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null));
             }
-            r.addSection(type, companySection);
         }
     }
 }
