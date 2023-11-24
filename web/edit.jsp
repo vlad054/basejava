@@ -50,8 +50,8 @@
                         <dd><label> Название компании <input type="text" title="Company Name" name="companyPNameX" value="${company.getName()}" required size=50></label></dd> <br>
                         <dd><label> Ссылка <input type="text" title="Company Web" name="companyPWebX" value="${company.getWebSite()}" size=50></label></dd> <br>
                         <dd><label> Позиция <input type="text" title="Period Name" name="periodNameX" value="${period.getName()}" required size=50></label></dd> <br>
-                        <dd><label> Нач. <input type="text" title="Period start Date dd/mm/yyyy" name="periodStartDateX" value="${period.getStartDate()}" required size=10></label> /
-                        <label> Кон. <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDateX" value="${empty period.getEndDate()?'Сейчас': period.getEndDate()}" size=10></label></dd> <br>
+                        <dd><label> Нач. <input type="text" placeholder="yyyy-mm-dd" title="Period start Date yyyy-mm-dd" name="periodStartDateX" value="${period.getStartDate()}" required size=10></label> /
+                        <label> Кон. <input type="text" placeholder="yyyy-mm-dd" title="Period end Date yyyy-mm-dd" name="periodEndDateX" value="${empty period.getEndDate()?'Сейчас': period.getEndDate()}" size=10></label></dd> <br>
                         <dd><label title="Section Descripion"> Описание
                                 <textarea
                                         cols="80" rows="5" name="periodDescX" >${period.getDescription()}</textarea>
@@ -66,8 +66,8 @@
                 <dd><label> Название компании <input type="text" title="Company Name" name="companyPNameX" size=50></label></dd> <br>
                 <dd><label> Ссылка <input type="text" title="Company Web" name="companyPWebX"  size=50></label></dd> <br>
                 <dd><label> Позиция <input type="text" title="Period Name" name="periodNameX"  size=50></label></dd> <br>
-                <dd><label> Нач. <input type="text" title="Period start Date dd/mm/yyyy" name="periodStartDateX"  size=10></label> /
-                    <label> Кон. <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDateX"  size=10></label></dd> <br>
+                <dd><label> Нач. <input type="text" placeholder="yyyy-mm-dd" title="Period start Date yyyy-mm-dd" name="periodStartDateX"  size=10></label> /
+                    <label> Кон. <input type="text" placeholder="yyyy-mm-dd" title="Period end Date yyyy-mm-dd" name="periodEndDateX"  size=10></label></dd> <br>
                 <dd><label title="Section Descripion"> Описание
                     <textarea
                             cols="80" rows="5" name="periodDescX" ></textarea>
@@ -86,8 +86,8 @@
                         <dd><label> Название компании <input type="text" title="Company Name" name="companyPNameE" value="${company.getName()}" required size=50></label></dd> <br>
                         <dd><label> Ссылка <input type="text" title="Company Web" name="companyPWebE" value="${company.getWebSite()}" size=50></label></dd> <br>
                         <dd><label> Позиция <input type="text" title="Period Name" name="periodNameE" value="${period.getName()}" required size=50></label></dd> <br>
-                        <dd><label> Нач. <input type="text" title="Period start Date dd/mm/yyyy" name="periodStartDateE" value="${period.getStartDate()}" required size=10></label> /
-                            <label> Кон. <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDateE" value="${empty period.getEndDate()?'Сейчас': period.getEndDate()}" size=10></label></dd> <br>
+                        <dd><label> Нач. <input type="text" placeholder="yyyy-mm-dd" title="Period start Date yyyy-mm-dd" name="periodStartDateE" value="${period.getStartDate()}" required size=10></label> /
+                            <label> Кон. <input type="text" placeholder="yyyy-mm-dd" title="Period end Date yyyy-mm-dd" name="periodEndDateE" value="${empty period.getEndDate()?'Сейчас': period.getEndDate()}" size=10></label></dd> <br>
                         <br>
                     </c:forEach>
                     <br>
@@ -98,8 +98,8 @@
                 <dd><label> Название компании <input type="text" title="Company Name" name="companyPNameE" size=50></label></dd> <br>
                 <dd><label> Ссылка <input type="text" title="Company Web" name="companyPWebE"  size=50></label></dd> <br>
                 <dd><label> Позиция <input type="text" title="Period Name" name="periodNameE"  size=50></label></dd> <br>
-                <dd><label> Нач. <input type="text" title="Period start Date dd/mm/yyyy" name="periodStartDateE"  size=10></label> /
-                    <label> Кон. <input type="text" title="Period end Date dd/mm/yyyy" name="periodEndDateE"  size=10></label></dd> <br>
+                <dd><label> Нач. <input type="text" placeholder="yyyy-mm-dd" title="Period start Date yyyy-mm-dd" name="periodStartDateE"  size=10></label> /
+                    <label> Кон. <input type="text" placeholder="yyyy-mm-dd" title="Period end Date yyyy-mm-dd" name="periodEndDateE"  size=10></label></dd> <br>
                 <br>
 
             </c:if>
